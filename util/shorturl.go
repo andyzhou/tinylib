@@ -20,7 +20,7 @@ const (
 	CharsetRandomAlphanumeric
 )
 
-//short url info
+//face info
 type ShortUrl struct {
 	cb func(url, keyword string) bool
 }

@@ -5,14 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d24bc31b-aa94-4cd8-8167-1655b7f45895" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/subconf.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/queue/queue.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/queue/ticker.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/http.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/logger.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/shorturl.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/signal.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/facemap.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/file.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/net.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/string.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/time.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/shorturl.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/shorturl.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +39,9 @@
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="2b1IL4jkyRPc30qBplnPoRu4dJO" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="autoscrollToSource" value="true" />

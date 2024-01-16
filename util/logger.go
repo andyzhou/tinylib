@@ -20,7 +20,7 @@ const (
 	LogFileCheckRate = 60 //xxx seconds
 )
 
-//log info
+//face info
 type LogService struct {
 	path string //log root path
 	prefix string //log file prefix

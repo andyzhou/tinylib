@@ -50,7 +50,7 @@ type HttpResp struct {
 	Err error
 }
 
-//http request
+//http request face info
 type HttpReq struct {
 	Kind int `GET or POST`
 	Url string
