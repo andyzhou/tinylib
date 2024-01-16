@@ -28,6 +28,20 @@ func NewRedis() *Redis {
 	return this
 }
 
+//quit
+func (f *Redis) Quit() {
+	sf := func(k, v interface{}) bool {
+		conn, ok := v.(*Connection)
+		if ok && conn != nil {
+			conn.Disconnect()
+		}
+		f.connMap.Delete(k)
+		return true
+	}
+	f.connMap.Range(sf)
+	f.pubSub.Close()
+}
+
 //get pub sub instance
 func (f *Redis) GetPubSub() *PubSub {
 	return f.pubSub

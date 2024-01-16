@@ -57,6 +57,8 @@ func (f *Connection) Disconnect() error {
 	var (
 		err error
 	)
+	f.Lock()
+	defer f.Unlock()
 	if f.client != nil {
 		err = f.client.Close()
 	}

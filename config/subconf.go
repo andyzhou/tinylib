@@ -30,10 +30,10 @@ type SubConfig struct {
 
 //construct
 func NewSubConfig(
-	confFile string,
-	cb func(map[string]interface{}) bool,
-	checkRate ... int,
-) *SubConfig {
+		confFile string,
+		cb func(map[string]interface{}) bool,
+		checkRate ... int,
+	) *SubConfig {
 	//self init
 	this := &SubConfig{
 		confFile:confFile,

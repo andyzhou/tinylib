@@ -25,7 +25,6 @@ func NewConfig(rootPaths ...string) *Config {
 func (c *Config) GetIniConf() *IniConfig {
 	return c.ini
 }
-
 func (c *Config) GetJsonConf() *JsonConfig {
 	return c.json
 }
