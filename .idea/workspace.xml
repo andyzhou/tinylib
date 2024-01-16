@@ -6,10 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d24bc31b-aa94-4cd8-8167-1655b7f45895" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/subconf.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/subconf.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/redis/connect.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/connect.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/redis.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/signal.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/signal.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -2,6 +2,7 @@ package util
 
 import (
 	"bufio"
+	"errors"
 	"log"
 	"os"
 	"os/signal"
@@ -35,13 +36,16 @@ type Signal struct {
 	SIGTERM  int32
 	SIGINT   int32
 	waitSeconds int
-	shutDownChan []chan bool //refer chan slice
+	shutDownChan chan bool //refer chan slice
 	ch chan os.Signal
 	stopSig chan bool
+	cbForQuit func()
+	initDone bool
 }
 
 //construct, step-1
 func NewSignal(waitSeconds ...int) *Signal {
+	//check
 	waitSecond := ShutDownWaitSeconds
 	if waitSeconds != nil && len(waitSeconds) > 0 {
 		waitSecond = waitSeconds[0]
@@ -49,16 +53,31 @@ func NewSignal(waitSeconds ...int) *Signal {
 	//self init
 	this := &Signal{
 		waitSeconds:waitSecond,
-		shutDownChan:make([]chan bool, 0),
+		shutDownChan:make(chan bool, 1),
 		ch:make(chan os.Signal, 1),
 		stopSig:make(chan bool, 1),
 	}
 	return this
 }
 
-////////////
-//api func
-////////////
+//register shut down chan, step-2
+func (f *Signal) RegisterShutDownChan(ch chan bool, cb func()) error {
+	//check
+	if ch == nil || cb == nil {
+		return errors.New("invalid parameter")
+	}
+
+	//sync
+	f.shutDownChan = ch
+	f.cbForQuit = cb
+
+	if !f.initDone {
+		//spawn son process to receive message
+		go f.receiveMsg()
+		f.initDone = true
+	}
+	return nil
+}
 
 //monitor signal, step-3
 func (f *Signal) MonSignal() {
@@ -105,41 +124,26 @@ func (f *Signal) ForceNotify() {
 	if f.shutDownChan == nil {
 		return
 	}
-
-	//send notify to relate chan
-	for _, ch := range f.shutDownChan {
-		ch <- true
-	}
-}
-
-//register shut down chan, step-2
-func (f *Signal) RegisterShutDownChan(chArr ... chan bool) bool {
-	//check
-	if chArr == nil || len(chArr) <= 0 {
-		return false
-	}
-
-	//check chan is exists
-	for _, ch := range chArr {
-		hasExist := false
-		for _, old := range f.shutDownChan {
-			if old == ch {
-				hasExist = true
-				break
-			}
-		}
-		if hasExist {
-			continue
-		}
-		//add new
-		f.shutDownChan = append(f.shutDownChan, ch)
-	}
-	return true
+	//send notify to chan
+	f.shutDownChan <- true
 }
 
 ///////////////
 //private func
 ///////////////
+
+//receive shut down message
+func (f *Signal) receiveMsg() {
+	select {
+	case <- f.shutDownChan:
+		{
+			if f.cbForQuit != nil {
+				f.cbForQuit()
+			}
+			return
+		}
+	}
+}
 
 //force quit
 func (f *Signal) forceQuit() {
@@ -162,9 +166,7 @@ func (f *Signal) notifyShutDownChan() {
 	}
 
 	//send notify to relate chan
-	for _, ch := range f.shutDownChan {
-		ch <- true
-	}
+	f.shutDownChan <- true
 
 	//sleep for a while
 	duration := time.Duration(f.waitSeconds) * time.Second
