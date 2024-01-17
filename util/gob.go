@@ -40,11 +40,15 @@ func (f *Gob) Load(fileName string, outVal interface{}) error {
 
 	//format gob file path
 	filePath := fmt.Sprintf("%v/%v", f.rootPath, fileName)
+	fileInfo, err := os.Stat(filePath)
+	if err != nil || fileInfo == nil {
+		return err
+	}
 
 	//try open file
-	file, err := os.OpenFile(filePath, os.O_RDONLY, FilePerm)
-	if err != nil {
-		return err
+	file, subErr := os.OpenFile(filePath, os.O_RDONLY, FilePerm)
+	if subErr != nil {
+		return subErr
 	}
 	defer file.Close()
 
