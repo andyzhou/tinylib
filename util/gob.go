@@ -86,6 +86,9 @@ func (f *Gob) Store(fileName string, inputVal interface{}) error {
 func (f *Gob) Register(val any) {
 	gob.Register(val)
 }
+func (f *Gob) RegisterName(name string, val any) {
+	gob.RegisterName(name, val)
+}
 
 //set root path
 func (f *Gob) SetRootPath(path string) {
