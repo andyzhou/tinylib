@@ -3,8 +3,8 @@ package util
 import (
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"os"
-	"path"
 	"sync"
 )
 
@@ -39,7 +39,8 @@ func (f *Gob) Load(fileName string, outVal interface{}) error {
 	}
 
 	//format gob file path
-	filePath := path.Join(f.rootPath, fileName)
+	filePath := fmt.Sprintf("%v/%v", f.rootPath, fileName)
+
 	//try open file
 	file, err := os.OpenFile(filePath, os.O_RDONLY, FilePerm)
 	if err != nil {
@@ -63,7 +64,9 @@ func (f *Gob) Store(fileName string, inputVal interface{}) error {
 	}
 
 	//format gob file path
-	filePath := path.Join(f.rootPath, fileName)
+	filePath := fmt.Sprintf("%v/%v", f.rootPath, fileName)
+
+	//open file
 	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, FilePerm)
 	if err != nil {
 		return err
