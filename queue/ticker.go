@@ -77,8 +77,12 @@ func (f *Ticker) runMainProcess() {
 			log.Printf("ticker.runMainProcess panic, err:%v\n", err)
 		}
 		//close relate chan
-		close(f.tickChan)
-		close(f.closeChan)
+		if f.tickChan != nil {
+			close(f.tickChan)
+		}
+		if f.closeChan != nil {
+			close(f.closeChan)
+		}
 	}()
 
 	//start first ticker
