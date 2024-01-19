@@ -76,6 +76,11 @@ func (f *Ticker) runMainProcess() {
 		if err := recover(); err != m {
 			log.Printf("ticker.runMainProcess panic, err:%v\n", err)
 		}
+		//run last opt
+		if f.cbForChecker != nil {
+			//call cb
+			f.cbForChecker()
+		}
 		//close relate chan
 		if f.tickChan != nil {
 			close(f.tickChan)
