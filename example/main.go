@@ -21,7 +21,7 @@ func testChanIsClosed() {
 }
 
 //test queue
-func testQueue()  {
+func testQueue() {
 	//init queue
 	q := queue.NewQueue()
 
@@ -45,6 +45,30 @@ func testQueue()  {
 	time.AfterFunc(time.Second * 2, delayOpt)
 }
 
+//test tick
+func testTick() {
+	//init tick
+	t := queue.NewTicker()
+
+	//set callback
+	cbForQuit := func() {
+		log.Printf("cbForQuit\n")
+	}
+	cbForCheckOpt := func() error {
+		log.Printf("cbForCheckOpt\n")
+		return nil
+	}
+
+	t.SetCheckerCallback(cbForCheckOpt)
+	t.SetQuitCallback(cbForQuit)
+
+	//delay opt
+	delayOpt := func() {
+		t.Quit()
+	}
+	time.AfterFunc(time.Second * 2, delayOpt)
+}
+
 func main() {
 	var (
 		wg sync.WaitGroup
@@ -53,7 +77,8 @@ func main() {
 
 	//test code
 	//testChanIsClosed()
-	testQueue()
+	//testQueue()
+	testTick()
 
 	wg.Wait()
 }
