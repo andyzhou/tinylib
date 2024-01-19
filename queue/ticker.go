@@ -48,7 +48,7 @@ func NewTicker(tickDurations ...time.Duration) *Ticker {
 //quit
 func (f *Ticker) Quit() {
 	if f.closeChan != nil {
-		close(f.closeChan)
+		f.closeChan <- true
 	}
 }
 
@@ -84,6 +84,9 @@ func (f *Ticker) runMainProcess() {
 		//close relate chan
 		if f.tickChan != nil {
 			close(f.tickChan)
+		}
+		if f.closeChan != nil {
+			close(f.closeChan)
 		}
 	}()
 

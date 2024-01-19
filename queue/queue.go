@@ -59,7 +59,7 @@ func NewQueue(queueSizes ...int) *Queue {
 //quit
 func (f *Queue) Quit() {
 	if f.closeChan != nil {
-		close(f.closeChan)
+		f.closeChan <- true
 	}
 }
 
@@ -173,6 +173,10 @@ func (f *Queue) runMainProcess() {
 		if f.reqChan != nil {
 			close(f.reqChan)
 			f.reqChan = nil
+		}
+		if f.closeChan != nil {
+			close(f.closeChan)
+			f.closeChan = nil
 		}
 	}()
 
