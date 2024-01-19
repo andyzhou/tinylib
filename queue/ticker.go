@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"github.com/andyzhou/tinylib/util"
 	"log"
 	"time"
 )
@@ -24,6 +25,7 @@ type Ticker struct {
 	closeChan chan bool
 	cbForChecker func() error
 	cbForQuit func()
+	util.Util
 }
 
 //construct
@@ -117,7 +119,10 @@ func (f *Ticker) runMainProcess() {
 				//send next ticker
 				sf := func() {
 					if f.tickChan != nil {
-						f.tickChan <- struct{}{}
+						chanIsClosed, _ := f.IsChanClosed(f.tickChan)
+						if !chanIsClosed {
+							f.tickChan <- struct{}{}
+						}
 					}
 				}
 				time.AfterFunc(f.tickDuration, sf)
