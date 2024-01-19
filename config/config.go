@@ -1,5 +1,11 @@
 package config
 
+/*
+ * config file face
+ * @author <AndyZhou>
+ * @mail <diudiu8848@163.com>
+ */
+
 //main face
 type Config struct {
 	ini *IniConfig

@@ -1,5 +1,11 @@
 package crypt
 
+/*
+ * crypt face
+ * @author <AndyZhou>
+ * @mail <diudiu8848@163.com>
+ */
+
 //face info
 type Crypt struct {
 	simple *SimpleEncrypt

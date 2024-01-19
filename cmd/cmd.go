@@ -6,6 +6,12 @@ import (
 	"os"
 )
 
+/*
+ * cmd args face
+ * @author <AndyZhou>
+ * @mail <diudiu8848@163.com>
+ */
+
 //face info
 type Cmd struct {
 	app *cli.App

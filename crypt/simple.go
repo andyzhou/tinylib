@@ -16,7 +16,7 @@ import (
  * @mail <diudiu8848@163.com>
  */
 
-// simple encrypt info
+//face info
 type SimpleEncrypt struct {
 	key string `base security key`
 }

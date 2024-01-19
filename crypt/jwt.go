@@ -10,6 +10,8 @@ import (
  * @author <AndyZhou>
  * @mail <diudiu8848@163.com>
  */
+
+//face info
 type Jwt struct {
 	secret string `secret key string`
 	token *jwt.Token `jwt token instance`
