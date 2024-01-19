@@ -21,7 +21,7 @@ const (
 type (
 	interReq struct {
 		req interface{} //origin input request
-		resp chan []byte //json byte data
+		resp chan interface{}
 		needResp bool
 	}
 )
@@ -29,10 +29,9 @@ type (
 //face info
 type Queue struct {
 	queueSize int
-	//reqChan chan interface{}
 	reqChan chan interReq
 	closeChan chan bool
-	cbForReq func(data interface{}) ([]byte, error)
+	cbForReq func(data interface{}) (interface{}, error)
 	closed bool
 	sync.RWMutex
 }
@@ -72,9 +71,9 @@ func (f *Queue) GetQueueSize() int {
 //send data, STEP-2
 func (f *Queue) SendData(
 	data interface{},
-	needResponses...bool) ([]byte, error) {
+	needResponses...bool) (interface{}, error) {
 	var (
-		resp []byte //json bytes
+		resp interface{}
 		needResponse bool
 	)
 	//check
@@ -99,7 +98,7 @@ func (f *Queue) SendData(
 		needResp: needResponse,
 	}
 	if needResponse {
-		req.resp = make(chan []byte, 1)
+		req.resp = make(chan interface{}, 1)
 	}
 
 	//send to chan with async mode
@@ -117,7 +116,7 @@ func (f *Queue) SendData(
 
 //set callback, STEP-1
 func (f *Queue) SetCallback(
-	cb func(data interface{}) ([]byte, error)) bool {
+	cb func(data interface{}) (interface{}, error)) bool {
 	if cb == nil {
 		return false
 	}
@@ -156,7 +155,7 @@ func (f *Queue) processChanLeftData() {
 func (f *Queue) runMainProcess() {
 	var (
 		orgReq interReq
-		resp []byte //json bytes
+		resp interface{}
 		isOk bool
 		m any = nil
 	)
@@ -166,8 +165,10 @@ func (f *Queue) runMainProcess() {
 		if err := recover(); err != m {
 			log.Printf("queue.runMainProcess panic, err:%v\n", err)
 		}
+
 		//process left data in chan
 		f.processChanLeftData()
+
 		//close request chan
 		if f.reqChan != nil {
 			close(f.reqChan)
@@ -175,6 +176,7 @@ func (f *Queue) runMainProcess() {
 		}
 		if f.closeChan != nil {
 			close(f.closeChan)
+			f.closeChan = nil
 		}
 	}()
 
@@ -196,8 +198,8 @@ func (f *Queue) runMainProcess() {
 				f.Lock()
 				f.closed = true
 				f.Unlock()
+				return
 			}
-			return
 		}
 	}
 }
