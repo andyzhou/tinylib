@@ -23,6 +23,7 @@ type Ticker struct {
 	tickChan chan struct{}
 	closeChan chan bool
 	cbForChecker func() error
+	cbForQuit func()
 }
 
 //construct
@@ -52,7 +53,16 @@ func (f *Ticker) Quit() {
 	}
 }
 
-//set callback, STEP-1
+//set callback for process quit
+func (f *Ticker) SetQuitCallback(cb func()) bool {
+	if cb == nil {
+		return false
+	}
+	f.cbForQuit = cb
+	return true
+}
+
+//set callback for data opt, STEP-1
 func (f *Ticker) SetCheckerCallback(cb func() error) bool {
 	if cb == nil {
 		return false
@@ -87,6 +97,11 @@ func (f *Ticker) runMainProcess() {
 		}
 		if f.closeChan != nil {
 			close(f.closeChan)
+		}
+
+		//call cb for quit
+		if f.cbForQuit != nil {
+			f.cbForQuit()
 		}
 	}()
 

@@ -32,6 +32,7 @@ type Queue struct {
 	reqChan chan interReq
 	closeChan chan bool
 	cbForReq func(data interface{}) (interface{}, error)
+	cbForQuit func()
 	closed bool
 	sync.RWMutex
 }
@@ -114,7 +115,16 @@ func (f *Queue) SendData(
 	return resp, nil
 }
 
-//set callback, STEP-1
+//set callback for process quit
+func (f *Queue) SetQuitCallback(cb func()) bool {
+	if cb == nil {
+		return false
+	}
+	f.cbForQuit = cb
+	return true
+}
+
+//set callback for data opt, STEP-1
 func (f *Queue) SetCallback(
 	cb func(data interface{}) (interface{}, error)) bool {
 	if cb == nil {
@@ -177,6 +187,11 @@ func (f *Queue) runMainProcess() {
 		if f.closeChan != nil {
 			close(f.closeChan)
 			f.closeChan = nil
+		}
+
+		//call cb for quit
+		if f.cbForQuit != nil {
+			f.cbForQuit()
 		}
 	}()
 
