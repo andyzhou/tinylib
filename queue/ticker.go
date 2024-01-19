@@ -91,14 +91,6 @@ func (f *Ticker) runMainProcess() {
 			//call cb
 			f.cbForChecker()
 		}
-		//close relate chan
-		if f.tickChan != nil {
-			close(f.tickChan)
-		}
-		if f.closeChan != nil {
-			close(f.closeChan)
-		}
-
 		//call cb for quit
 		if f.cbForQuit != nil {
 			f.cbForQuit()

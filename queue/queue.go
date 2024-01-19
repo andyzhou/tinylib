@@ -179,16 +179,6 @@ func (f *Queue) runMainProcess() {
 		//process left data in chan
 		f.processChanLeftData()
 
-		//close request chan
-		if f.reqChan != nil {
-			close(f.reqChan)
-			f.reqChan = nil
-		}
-		if f.closeChan != nil {
-			close(f.closeChan)
-			f.closeChan = nil
-		}
-
 		//call cb for quit
 		if f.cbForQuit != nil {
 			f.cbForQuit()
