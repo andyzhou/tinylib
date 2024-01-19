@@ -174,10 +174,6 @@ func (f *Queue) runMainProcess() {
 			close(f.reqChan)
 			f.reqChan = nil
 		}
-		if f.closeChan != nil {
-			close(f.closeChan)
-			f.closeChan = nil
-		}
 	}()
 
 	//loop

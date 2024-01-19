@@ -85,9 +85,6 @@ func (f *Ticker) runMainProcess() {
 		if f.tickChan != nil {
 			close(f.tickChan)
 		}
-		if f.closeChan != nil {
-			close(f.closeChan)
-		}
 	}()
 
 	//start first ticker
