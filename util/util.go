@@ -67,6 +67,50 @@ func (f *Util) Int2Str(input int64) string {
 	return fmt.Sprintf("%v", input)
 }
 
+//slice convert
+func (f *Util) GenSlice2StrSlice(input ...interface{}) []string {
+	if input == nil {
+		return nil
+	}
+	result := make([]string, 0)
+	for _, val := range input {
+		if val == nil {
+			continue
+		}
+		result = append(result, fmt.Sprintf("%v", val))
+	}
+	return result
+}
+
+func (f *Util) IntSlice2StrSlice(input ...int64) []string {
+	if input == nil {
+		return nil
+	}
+	result := make([]string, 0)
+	for _, val := range input {
+		if val <= 0 {
+			continue
+		}
+		result = append(result, fmt.Sprintf("%v", val))
+	}
+	return result
+}
+
+func (f *Util) StrSlice2IntSlice(input ...string) []int64 {
+	if input == nil {
+		return nil
+	}
+	result := make([]int64, 0)
+	for _, val := range input {
+		if val == "" {
+			continue
+		}
+		intVal, _ := strconv.ParseInt(val, 10, 64)
+		result = append(result, intVal)
+	}
+	return result
+}
+
 //get ascii value
 func (f *Util) GetAsciiValue(
 	input string,
