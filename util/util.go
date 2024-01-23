@@ -81,7 +81,6 @@ func (f *Util) GenSlice2StrSlice(input ...interface{}) []string {
 	}
 	return result
 }
-
 func (f *Util) IntSlice2StrSlice(input ...int64) []string {
 	if input == nil {
 		return nil
@@ -95,7 +94,6 @@ func (f *Util) IntSlice2StrSlice(input ...int64) []string {
 	}
 	return result
 }
-
 func (f *Util) StrSlice2IntSlice(input ...string) []int64 {
 	if input == nil {
 		return nil
@@ -107,6 +105,26 @@ func (f *Util) StrSlice2IntSlice(input ...string) []int64 {
 		}
 		intVal, _ := strconv.ParseInt(val, 10, 64)
 		result = append(result, intVal)
+	}
+	return result
+}
+func (f *Util) StrSlice2GenSlice(input ...string) []interface{} {
+	if input == nil {
+		return nil
+	}
+	result := make([]interface{}, 0)
+	for _, val := range input {
+		result = append(result, val)
+	}
+	return result
+}
+func (f *Util) IntSlice2GenSlice(input ...int64) []interface{} {
+	if input == nil {
+		return nil
+	}
+	result := make([]interface{}, 0)
+	for _, v := range input {
+		result = append(result, v)
 	}
 	return result
 }
