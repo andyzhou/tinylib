@@ -82,14 +82,26 @@ func (f *App) Start(port int) bool {
 func (f *App) RegisterSubApp(
 			reqUrlPara string,
 			face IWebSubApp,
+			incPathParas ...bool,
 		) bool {
+	var (
+		requestAnyPath string
+		incPathPara bool
+	)
 	//check
 	if reqUrlPara == "" || face == nil {
 		return false
 	}
+	if incPathParas != nil && len(incPathParas) > 0 {
+		incPathPara = incPathParas[0]
+	}
 
 	//root request route
-	requestAnyPath := fmt.Sprintf("/%v/*%v", reqUrlPara, AnyPath)
+	if incPathPara {
+		requestAnyPath = reqUrlPara
+	}else{
+		requestAnyPath = fmt.Sprintf("/%v/*%v", reqUrlPara, AnyPath)
+	}
 
 	//set get、post request
 	f.server.Any(requestAnyPath, face.Entry)
