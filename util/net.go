@@ -51,7 +51,6 @@ func (f *Net) GetOutIp() (string, error) {
 
 //gather all ip from client
 func (f *Net) GetClientAllIp(r *http.Request) []string {
-	var tempStr string
 	var ipSlice = make([]string, 0)
 
 	//get original data
@@ -61,34 +60,19 @@ func (f *Net) GetClientAllIp(r *http.Request) []string {
 
 	//analyze general ip
 	if clientAddress != "" {
-		tempStr = f.analyzeClientIp(clientAddress)
-		if tempStr != "" {
-			ipSlice = append(ipSlice, tempStr)
-		}
+		ipSlice = append(ipSlice, clientAddress)
 	}
 
 	//analyze x-real-ip
 	if xRealIp != "" {
-		tempStr = f.analyzeClientIp(clientAddress)
-		if tempStr != "" {
-			ipSlice = append(ipSlice, tempStr)
-		}
+		ipSlice = append(ipSlice, xRealIp)
 	}
 
 	//analyze x-forward-for
 	//like:192.168.0.1,192.168.0.2
 	if xForwardedFor != "" {
-		tempSlice := strings.Split(xForwardedFor, ",")
-		if len(tempSlice) > 0 {
-			for _, tmpAddr := range tempSlice {
-				tempStr = f.analyzeClientIp(tmpAddr)
-				if tempStr != "" {
-					ipSlice = append(ipSlice, tempStr)
-				}
-			}
-		}
+		ipSlice = append(ipSlice, xForwardedFor)
 	}
-
 	return ipSlice
 }
 
