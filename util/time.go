@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -97,6 +98,51 @@ func (f *Time) ConvertStrTime2Unix(timeStr string) (int64, error) {
 //convert timestamp to date format string
 func (f *Time) Timestamp2Str(timeStamp int64) string {
 	return time.Unix(timeStamp, 0).UTC().Format(TimeLayoutStr)
+}
+
+//convert timestamp to date format
+func (f *Time) TimeStamp2DateTime(timeStamp int64) string {
+	return time.Unix(timeStamp, 0).UTC().Format(TimeLayoutStr)
+}
+
+//convert timestamp to date format, like YYYY-MM-DD
+func (f *Time) TimeStamp2Date(timeStamp int64) string {
+	dateTime := time.Unix(timeStamp, 0).Format(TimeLayoutStr)
+	tempSlice := strings.Split(dateTime, " ")
+	if tempSlice == nil || len(tempSlice) <= 0 {
+		return ""
+	}
+	return tempSlice[0]
+}
+
+//convert timestamp like 'Oct 10, 2020' format
+func (f *Time) TimeStampToDayStr(timeStamp int64, monthSizes ...int) string {
+	var (
+		monthSize int
+	)
+	date := f.TimeStamp2Date(timeStamp)
+	if date == "" {
+		return  ""
+	}
+	tempSlice := strings.Split(date, "-")
+	if tempSlice == nil || len(tempSlice) < 3 {
+		return ""
+	}
+	if monthSizes != nil && len(monthSizes) > 0 {
+		monthSize = monthSizes[0]
+	}
+
+	//get key info
+	year := tempSlice[0]
+	month, _ := strconv.Atoi(tempSlice[1])
+	day := tempSlice[2]
+
+	//get assigned size month info
+	monthInfo := time.Month(month).String()
+	if monthSize > 0 && monthSize <= len(monthInfo) {
+		monthInfo = monthInfo[:monthSize]
+	}
+	return fmt.Sprintf("%s %s, %s", monthInfo, day, year)
 }
 
 //convert date time string to timestamp
