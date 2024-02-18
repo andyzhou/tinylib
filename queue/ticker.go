@@ -55,6 +55,12 @@ func (f *Ticker) Quit() {
 	}
 }
 
+//check ticker is closed
+func (f *Ticker) QueueClosed() bool {
+	closed, _ := f.IsChanClosed(f.tickChan)
+	return closed
+}
+
 //set callback for process quit
 func (f *Ticker) SetQuitCallback(cb func()) bool {
 	if cb == nil {
@@ -97,6 +103,8 @@ func (f *Ticker) runMainProcess() {
 		if f.cbForQuit != nil {
 			f.cbForQuit()
 		}
+		//close tick chan
+		close(f.tickChan)
 	}()
 
 	//start first ticker

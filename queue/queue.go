@@ -2,6 +2,7 @@ package queue
 
 import (
 	"errors"
+	"github.com/andyzhou/tinylib/util"
 	"log"
 	"sync"
 )
@@ -34,6 +35,7 @@ type Queue struct {
 	cbForReq func(data interface{}) (interface{}, error)
 	cbForQuit func()
 	closed bool
+	util.Util
 	sync.RWMutex
 }
 
@@ -62,6 +64,12 @@ func (f *Queue) Quit() {
 	if f.closeChan != nil {
 		f.closeChan <- true
 	}
+}
+
+//check queue is closed
+func (f *Queue) QueueClosed() bool {
+	closed, _ := f.IsChanClosed(f.reqChan)
+	return closed
 }
 
 //get run queue size
@@ -183,6 +191,9 @@ func (f *Queue) runMainProcess() {
 		if f.cbForQuit != nil {
 			f.cbForQuit()
 		}
+
+		//close req chan
+		close(f.reqChan)
 	}()
 
 	//loop
