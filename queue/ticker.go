@@ -110,7 +110,10 @@ func (f *Ticker) runMainProcess() {
 	//start first ticker
 	if f.tickChan != nil {
 		sf := func() {
-			f.tickChan <- struct{}{}
+			chanIsClosed, _ := f.IsChanClosed(f.tickChan)
+			if !chanIsClosed {
+				f.tickChan <- struct{}{}
+			}
 		}
 		time.AfterFunc(f.tickDuration, sf)
 	}
