@@ -2,6 +2,7 @@ package queue
 
 import (
 	"errors"
+	"fmt"
 	"github.com/andyzhou/tinylib/util"
 	"log"
 	"sync"
@@ -92,8 +93,14 @@ func (f *Queue) SendData(
 	if f.closed {
 		return nil, errors.New("inter chan has closed")
 	}
-	if f.reqChan == nil || f.GetQueueSize() >= f.queueSize {
-		return nil, errors.New("inter chan invalid or full")
+	if f.reqChan == nil {
+		return nil, errors.New("inter chan is nil")
+	}
+
+	//check active queue size
+	queueSize := f.GetQueueSize()
+	if queueSize >= f.queueSize {
+		return nil, fmt.Errorf("inter queue size %v up to limit %v", queueSize, f.queueSize)
 	}
 
 	//detect
