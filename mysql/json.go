@@ -360,20 +360,29 @@ func (f *JsonData) GetBathRandomData(
 //get one data
 //dataField default value is 'data'
 func (f *JsonData) GetOneData(
-			dataField string,
 			whereMap map[string]WherePara,
 			needRand bool,
 			table string,
 			db *Connect,
+			dataFields ...string,
 		) ([]byte, error) {
+	var (
+		dataField string
+	)
+	//check data fields
+	if dataFields != nil && len(dataFields) > 0 {
+		dataField = dataFields[0]
+	}
 	if dataField == "" {
 		dataField = TableFieldOfData
 	}
-	dataFields := []string{
+	dataFieldsFinal := []string{
 		dataField,
 	}
+
+	//call base func
 	byteMap, err := f.GetOneDataAdv(
-		dataFields,
+		dataFieldsFinal,
 		whereMap,
 		needRand,
 		table,
