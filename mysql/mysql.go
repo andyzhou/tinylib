@@ -20,6 +20,16 @@ func NewMysql() *Mysql {
 	return this
 }
 
+//quit
+func (f *Mysql) Quit() {
+	f.Lock()
+	defer f.Unlock()
+	for k, v := range f.connectMap {
+		v.Quit()
+		delete(f.connectMap, k)
+	}
+}
+
 //get connect
 func (f *Mysql) GetConnect(tag string) *Connect {
 	f.Lock()
