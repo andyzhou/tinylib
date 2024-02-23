@@ -1133,7 +1133,7 @@ func (f *JsonData) formatWhereSql(
 	whereBuffer.WriteString(" WHERE ")
 	for i, wherePara := range whereArr {
 		field := wherePara.Field
-		if i > 0 && wherePara.Kind != WhereKindOfOrVal {
+		if i > 0 {
 			if wherePara.Kind == WhereKindOfOrVal {
 				whereBuffer.WriteString(" OR ")
 			}else{
