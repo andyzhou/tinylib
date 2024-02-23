@@ -18,4 +18,5 @@ const (
 	WhereKindOfIn	  //for in('x','y')
 	WhereKindOfInSet  //for FIND_IN_SET(val, `x`, 'y')
 	WhereKindOfAssigned //for assigned condition, like '>', '<', '!=', etc.
+	WhereKindOfOrVal	//for or xxx opt
 )

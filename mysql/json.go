@@ -1177,6 +1177,12 @@ func (f *JsonData) formatWhereSql(
 				whereBuffer.WriteString(tempStr)
 				values = append(values, wherePara.Val)
 			}
+		case WhereKindOfOrVal:
+			{
+				tempStr = fmt.Sprintf("or %s = ?", field)
+				whereBuffer.WriteString(tempStr)
+				values = append(values, wherePara.Val)
+			}
 		case WhereKindOfGen:
 			fallthrough
 		default:
