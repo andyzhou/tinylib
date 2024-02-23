@@ -20,6 +20,7 @@ import (
 type (
 	//where para
 	WherePara struct {
+		Field string
 		Kind int
 		Condition string //used for `WhereKindOfAssigned`, for example ">", "<=", etc.
 		Val interface{}
@@ -40,7 +41,7 @@ type JsonData struct {}
 //field should be integer kind
 func (f *JsonData) GetMaxVal(
 			jsonField string,
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			objField string,
 			table string,
 			db *Connect,
@@ -59,7 +60,7 @@ func (f *JsonData) GetMaxVal(
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -82,7 +83,7 @@ func (f *JsonData) GetMaxVal(
 //field should be integer kind
 func (f *JsonData) SumCount(
 			jsonField string,
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			objField string,
 			table string,
 			db *Connect,
@@ -101,7 +102,7 @@ func (f *JsonData) SumCount(
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -122,7 +123,7 @@ func (f *JsonData) SumCount(
 
 //get total num
 func (f *JsonData) GetTotalNum(
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			table string,
 			db *Connect,
 		) (int64, error) {
@@ -137,7 +138,7 @@ func (f *JsonData) GetTotalNum(
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -198,7 +199,7 @@ func (f *JsonData) GetByteDataAdv(
 
 //get batch data with condition
 func (f *JsonData) GetBatchData(
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			orderBy []OrderBy,
 			offset int,
 			size int,
@@ -207,7 +208,7 @@ func (f *JsonData) GetBatchData(
 		) ([][]byte, error) {
 	recordsMap, err := f.GetBatchDataAdv(
 		nil,
-		whereMap,
+		whereArr,
 		orderBy,
 		offset,
 		size,
@@ -238,7 +239,7 @@ func (f *JsonData) GetBatchData(
 
 func (f *JsonData) GetBatchDataAdv(
 			dataFields []string,
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			orderBy []OrderBy,
 			offset int,
 			size int,
@@ -270,7 +271,7 @@ func (f *JsonData) GetBatchDataAdv(
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -322,7 +323,7 @@ func (f *JsonData) GetBatchDataAdv(
 
 //get batch random data
 func (f *JsonData) GetBathRandomData(
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			size int,
 			table string,
 			db *Connect,
@@ -343,7 +344,7 @@ func (f *JsonData) GetBathRandomData(
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -383,7 +384,7 @@ func (f *JsonData) GetBathRandomData(
 //get one data
 //dataField default value is 'data'
 func (f *JsonData) GetOneData(
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			needRand bool,
 			table string,
 			db *Connect,
@@ -406,7 +407,7 @@ func (f *JsonData) GetOneData(
 	//call base func
 	byteMap, err := f.GetOneDataAdv(
 		dataFieldsFinal,
-		whereMap,
+		whereArr,
 		needRand,
 		table,
 		db,
@@ -426,7 +427,7 @@ func (f *JsonData) GetOneData(
 
 func (f *JsonData) GetOneDataAdv(
 			dataFields []string,
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			needRand bool,
 			table string,
 			db *Connect,
@@ -444,7 +445,7 @@ func (f *JsonData) GetOneDataAdv(
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -527,19 +528,19 @@ func (f *JsonData) AddData(
 
 //delete data
 func (f *JsonData) DelOneData(
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			table string,
 			db *Connect,
 		) error {
 	return f.DelData(
-		whereMap,
+		whereArr,
 		table,
 		db,
 	)
 }
 
 func (f *JsonData) DelData(
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			table string,
 			db *Connect,
 		) error {
@@ -548,12 +549,12 @@ func (f *JsonData) DelData(
 	)
 
 	//basic check
-	if whereMap == nil || table == "" || db == nil {
+	if whereArr == nil || table == "" || db == nil {
 		return errors.New("invalid parameter")
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -569,17 +570,17 @@ func (f *JsonData) DelData(
 //update one base data
 func (f *JsonData) UpdateBaseData(
 			dataByte []byte,
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			table string,
 			db *Connect,
 		) error {
-	return f.UpdateBaseDataAdv("", dataByte, whereMap, table, db)
+	return f.UpdateBaseDataAdv("", dataByte, whereArr, table, db)
 }
 
 func (f *JsonData) UpdateBaseDataAdv(
 			dataField string,
 			dataByte []byte,
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			table string,
 			db *Connect,
 		) error {
@@ -589,7 +590,7 @@ func (f *JsonData) UpdateBaseDataAdv(
 	)
 
 	//basic check
-	if dataByte == nil || whereMap == nil ||
+	if dataByte == nil || whereArr == nil ||
 		table == "" || db == nil {
 		return errors.New("invalid parameter")
 	}
@@ -602,7 +603,7 @@ func (f *JsonData) UpdateBaseDataAdv(
 	values = append(values, dataByte)
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -622,14 +623,14 @@ func (f *JsonData) UpdateBaseDataAdv(
 //increase or decrease field value
 func (f *JsonData) UpdateCountOfData(
 			updateMap map[string]interface{},
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			table string,
 			db *Connect,
 			isOverWrites ...bool,
 		) error {
 	return f.UpdateCountOfDataAdv(
 		updateMap,
-		whereMap,
+		whereArr,
 		TableFieldOfData,
 		table,
 		db,
@@ -639,7 +640,7 @@ func (f *JsonData) UpdateCountOfData(
 
 func (f *JsonData) UpdateCountOfDataAdv(
 			updateMap map[string]interface{},
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			objField string,
 			table string,
 			db *Connect,
@@ -654,12 +655,12 @@ func (f *JsonData) UpdateCountOfDataAdv(
 	)
 
 	//basic check
-	if updateMap == nil || whereMap == nil ||
+	if updateMap == nil || whereArr == nil ||
 		table == "" || db == nil {
 		return errors.New("invalid parameter")
 	}
 
-	if len(updateMap) <= 0 || len(whereMap) <= 0 {
+	if len(updateMap) <= 0 || len(whereArr) <= 0 {
 		return errors.New("update map is nil")
 	}
 
@@ -699,7 +700,7 @@ func (f *JsonData) UpdateCountOfDataAdv(
 	updateBuffer.WriteString(")")
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -721,14 +722,14 @@ func (f *JsonData) UpdateCountOfDataAdv(
 func (f *JsonData) UpdateData(
 			updateMap map[string]interface{},
 			ObjArrMap map[string][]interface{},
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			table string,
 			db *Connect,
 		) error {
 	return f.UpdateDataAdv(
 		updateMap,
 		ObjArrMap,
-		whereMap,
+		whereArr,
 		TableFieldOfData,
 		table,
 		db,
@@ -739,7 +740,7 @@ func (f *JsonData) UpdateData(
 func (f *JsonData) UpdateDataAdv(
 			updateMap map[string]interface{},
 			objArrMap map[string][]interface{},
-			whereMap map[string]WherePara,
+			whereArr []WherePara,
 			objField string,
 			table string,
 			db *Connect,
@@ -759,12 +760,12 @@ func (f *JsonData) UpdateDataAdv(
 	)
 
 	//basic check
-	if updateMap == nil || whereMap == nil ||
+	if updateMap == nil || whereArr == nil ||
 		table == "" || db == nil {
 		return errors.New("invalid parameter")
 	}
 
-	if len(updateMap) <= 0 || len(whereMap) <= 0 {
+	if len(updateMap) <= 0 || len(whereArr) <= 0 {
 		return errors.New("update map is nil")
 	}
 
@@ -842,7 +843,7 @@ func (f *JsonData) UpdateDataAdv(
 	}
 
 	//format where sql
-	whereBuffer, whereValues := f.formatWhereSql(whereMap)
+	whereBuffer, whereValues := f.formatWhereSql(whereArr)
 	if whereValues != nil {
 		values = append(values, whereValues...)
 	}
@@ -1114,7 +1115,7 @@ func (f *JsonData) getIntegerVal(
 
 //format where sql
 func (f *JsonData) formatWhereSql(
-				whereMap map[string]WherePara,
+				whereArr []WherePara,
 			) (*bytes.Buffer, []interface{}) {
 	var (
 		tempStr string
@@ -1124,16 +1125,20 @@ func (f *JsonData) formatWhereSql(
 		values = make([]interface{}, 0)
 	)
 
-	if whereMap == nil || len(whereMap) <= 0 {
+	if whereArr == nil || len(whereArr) <= 0 {
 		return whereBuffer, nil
 	}
 
 	//format where sql
-	i := 0
 	whereBuffer.WriteString(" WHERE ")
-	for field, wherePara := range whereMap {
-		if i > 0 {
-			whereBuffer.WriteString(" AND ")
+	for i, wherePara := range whereArr {
+		field := wherePara.Field
+		if i > 0 && wherePara.Kind != WhereKindOfOrVal {
+			if wherePara.Kind == WhereKindOfOrVal {
+				whereBuffer.WriteString(" OR ")
+			}else{
+				whereBuffer.WriteString(" AND ")
+			}
 		}
 		whereKind = wherePara.Kind
 		switch whereKind {
@@ -1174,12 +1179,6 @@ func (f *JsonData) formatWhereSql(
 			{
 				//like field >= value, etc.
 				tempStr = fmt.Sprintf("%s %s ?", field, wherePara.Condition)
-				whereBuffer.WriteString(tempStr)
-				values = append(values, wherePara.Val)
-			}
-		case WhereKindOfOrVal:
-			{
-				tempStr = fmt.Sprintf("or %s = ?", field)
 				whereBuffer.WriteString(tempStr)
 				values = append(values, wherePara.Val)
 			}
