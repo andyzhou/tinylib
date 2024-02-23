@@ -16,12 +16,22 @@ import (
  * - use as anonymous class
  */
 
-//where para
-type WherePara struct {
-	Kind int
-	Condition string //used for `WhereKindOfAssigned`, for example ">", "<=", etc.
-	Val interface{}
-}
+//inter type
+type (
+	//where para
+	WherePara struct {
+		Kind int
+		Condition string //used for `WhereKindOfAssigned`, for example ">", "<=", etc.
+		Val interface{}
+	}
+
+	//order by para
+	OrderBy struct {
+		Field string
+		Desc bool
+	}
+)
+
 
 //face info
 type JsonData struct {}
@@ -189,7 +199,7 @@ func (f *JsonData) GetByteDataAdv(
 //get batch data with condition
 func (f *JsonData) GetBatchData(
 			whereMap map[string]WherePara,
-			orderBy string,
+			orderBy []OrderBy,
 			offset int,
 			size int,
 			table string,
@@ -229,7 +239,7 @@ func (f *JsonData) GetBatchData(
 func (f *JsonData) GetBatchDataAdv(
 			dataFields []string,
 			whereMap map[string]WherePara,
-			orderBy string,
+			orderBy []OrderBy,
 			offset int,
 			size int,
 			table string,
@@ -271,8 +281,21 @@ func (f *JsonData) GetBatchDataAdv(
 	}
 
 	//format order by sql
-	if orderBy != "" {
-		orderBySql = fmt.Sprintf(" ORDER BY %s", orderBy)
+	if orderBy != nil && len(orderBy) > 0 {
+		orderByBytes := bytes.NewBuffer(nil)
+		idx := 0
+		orderByBytes.WriteString("ORDER BY ")
+		for _, v := range orderBy {
+			if idx > 0 {
+				orderByBytes.WriteString(",")
+			}
+			descInfo := "ASC"
+			if v.Desc {
+				descInfo = "DESC"
+			}
+			orderByBytes.WriteString(fmt.Sprintf("%v %v", v.Field, descInfo))
+		}
+		orderBySql = fmt.Sprintf("	%v", orderByBytes.String())
 	}
 
 	//format sql
