@@ -35,14 +35,25 @@ func NewList() *List {
 }
 
 //quit
-func (f *List) Quit() {
+func (f *List) Quit(forces ...bool) {
 	var (
 		listLen int
 		data *list.Element
+		force bool
 	)
+	if forces != nil && len(forces) > 0 {
+		force = forces[0]
+	}
+
 	//set closed
 	f.closed = true
 	time.Sleep(time.Second)
+
+	if force {
+		//just clean list
+		f.l.Init()
+		return
+	}
 
 	//process left list elements
 	for {
@@ -154,7 +165,9 @@ func (f *List) runConsumeProcess(rates ...float64) {
 
 		//pop front element
 		data = f.l.Front()
-		f.cbForConsumer(data.Value)
+		if data.Value != nil {
+			f.cbForConsumer(data.Value)
+		}
 		f.l.Remove(data)
 	}
 }
