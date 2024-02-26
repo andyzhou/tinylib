@@ -20,8 +20,8 @@ var (
 func init() {
 	//init worker
 	worker = queue.NewWorker()
-	//worker.SetCBForBindObjTickerOpt(cbForBindObjTicker)
-	worker.SetCBForGenTickerOpt(cbForGenTicker)
+	worker.SetCBForBindObjTickerOpt(cbForBindObjTicker)
+	//worker.SetCBForGenTickerOpt(cbForGenTicker)
 }
 
 //cb for bind obj ticker
@@ -52,21 +52,17 @@ func bindObjAccess(val int64) (interface{}, error) {
 	}
 
 	//get obj
-	obj := sonWorker.GetBindObj()
+	objMap := sonWorker.GetBindObj()
 
 	//check or init obj
-	if obj == nil {
-		obj = make(map[int64]interface{})
-	}
-	objMap, ok := obj.(map[int64]interface{})
-	if !ok || objMap == nil {
-		return nil, errors.New("invalid obj type")
+	if objMap == nil {
+		objMap = make(map[int64]interface{})
 	}
 
 	//update obj
 	objMap[val] = val
-	err = sonWorker.UpdateBindObj(objMap)
-	return obj, err
+	err = sonWorker.UpdateBindObj(val, val)
+	return objMap, err
 }
 
 //test chan

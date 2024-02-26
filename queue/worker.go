@@ -20,7 +20,7 @@ import (
 type (
 	SonWorker struct {
 		workerId int32
-		bindObj interface{}
+		bindObjs map[int64]interface{}
 		queue *Queue
 		ticker *Ticker
 		//cb for ticker
@@ -266,6 +266,7 @@ func NewSonWorker(id int32, tickerRates ...float64) *SonWorker {
 	//self init
 	this := &SonWorker{
 		workerId: id,
+		bindObjs: map[int64]interface{}{},
 	}
 
 	//check and start default ticker
@@ -334,24 +335,38 @@ func (f *SonWorker) SetCBForBindObjTicker(cb func(int32,...interface{}) error) e
 }
 
 //get bind obj
-func (f *SonWorker) GetBindObj() interface{} {
+func (f *SonWorker) GetBindObj() map[int64]interface{} {
 	//get with locker
 	f.Lock()
 	defer f.Unlock()
-	return f.bindObj
+	return f.bindObjs
+}
+
+//remove bind obj
+func (f *SonWorker) RemoveBindObj(objId int64) error {
+	//check
+	if objId <= 0 {
+		return errors.New("invalid parameter")
+	}
+
+	//remove with locker
+	f.Lock()
+	defer f.Unlock()
+	delete(f.bindObjs, objId)
+	return nil
 }
 
 //update bind obj
-func (f *SonWorker) UpdateBindObj(obj interface{}) error {
+func (f *SonWorker) UpdateBindObj(objId int64, obj interface{}) error {
 	//check
-	if obj == nil {
+	if objId <= 0 || obj == nil {
 		return errors.New("invalid parameter")
 	}
 
 	//sync bind obj with locker
 	f.Lock()
 	defer f.Unlock()
-	f.bindObj = obj
+	f.bindObjs[objId] = obj
 	return nil
 }
 
@@ -374,6 +389,6 @@ func (f *SonWorker) interCBForBindObjTicker() error {
 	if f.cbForBindObjTicker == nil {
 		return errors.New("inter cb for bind obj opt is nil")
 	}
-	err := f.cbForBindObjTicker(f.workerId, f.bindObj)
+	err := f.cbForBindObjTicker(f.workerId, f.bindObjs)
 	return err
 }
