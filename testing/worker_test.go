@@ -42,29 +42,19 @@ func cbForBindObjTicker(workerId int32, objs ...interface{}) error {
 //bind obj access
 func bindObjAccess(val int64) (interface{}, error) {
 	//get rand worker id
-	workerId := rand.Intn(maxWorkers) + 1
+	targetWorkerId := rand.Intn(maxWorkers) + 1
 
 	//get son worker
-	sonWorker, err := worker.GetWorker(int32(workerId))
+	sonWorker, err := worker.GetWorker(int32(targetWorkerId))
 	if err != nil {
 		return nil, err
 	}
 
 	//get obj
-	obj := sonWorker.GetBindObj()
-
-	//check or init obj
-	if obj == nil {
-		obj = make(map[int64]interface{})
-	}
-	objMap, ok := obj.(map[int64]interface{})
-	if !ok || objMap == nil {
-		return nil, errors.New("invalid obj type")
-	}
+	obj, _ := sonWorker.GetBindObj(val)
 
 	//update obj
-	objMap[val] = val
-	err = sonWorker.UpdateBindObj(objMap)
+	err = sonWorker.UpdateBindObj(val, val)
 	return obj, err
 }
 

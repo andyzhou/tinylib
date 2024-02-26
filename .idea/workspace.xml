@@ -7,6 +7,7 @@
     <list default="true" id="d24bc31b-aa94-4cd8-8167-1655b7f45895" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/queue/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/worker_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/testing/worker_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
