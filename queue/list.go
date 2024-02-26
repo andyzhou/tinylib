@@ -8,15 +8,10 @@ import (
 )
 
 /*
- * general list worker
+ * general list worker [developing]
  * @author <AndyZhou>
  * @mail <diudiu8848@163.com>
  */
-
-//inter macro define
-const (
-	listConsumeRate = 1 //xx seconds
-)
 
 //face info
 type List struct {
@@ -145,7 +140,7 @@ func (f *List) runConsumeProcess(rates ...float64) {
 		rate = rates[0]
 	}
 	if rate <= 0 {
-		rate = listConsumeRate
+		rate = DefaultListConsumeRate
 	}
 	rateDuration := time.Duration(rate) * time.Second
 

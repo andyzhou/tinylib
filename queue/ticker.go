@@ -13,11 +13,6 @@ import (
  * - used for run auto ticker queue data
  */
 
-//inter macro define
-const (
-	DefaultTickTimer = time.Second
-)
-
 //face info
 type Ticker struct {
 	tickDuration time.Duration
@@ -29,20 +24,24 @@ type Ticker struct {
 }
 
 //construct
-func NewTicker(tickDurations ...time.Duration) *Ticker {
-	//set ticker rate
-	defaultTicker := DefaultTickTimer
+//realDur := tickDuration * time.Second
+func NewTicker(tickDurations ...float64) *Ticker {
+	//check and set ticker rate
+	defaultDuration := float64(1) //default 1 second
 	if tickDurations != nil && len(tickDurations) > 0 {
 		if tickDurations[0] > 0 {
-			defaultTicker = tickDurations[0]
+			defaultDuration = tickDurations[0]
 		}
 	}
+	durationTicker := time.Duration(int64(defaultDuration * float64(time.Second)))
+
 	//self init
 	this := &Ticker{
-		tickDuration: defaultTicker,
+		tickDuration: durationTicker,
 		tickChan: make(chan struct{}, 1),
 		closeChan: make(chan bool, 1),
 	}
+
 	//spawn main process
 	go this.runMainProcess()
 	return this
@@ -115,7 +114,7 @@ func (f *Ticker) runMainProcess() {
 				f.tickChan <- struct{}{}
 			}
 		}
-		time.AfterFunc(f.tickDuration, sf)
+		sf()
 	}
 
 	//loop

@@ -14,10 +14,7 @@ import (
  * @mail <diudiu8848@163.com>
  */
 
-//inter macro define
-const (
-	DefaultQueueSize = 1024
-)
+
 
 //inter type
 type (
