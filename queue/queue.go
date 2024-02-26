@@ -198,6 +198,7 @@ func (f *Queue) runMainProcess() {
 
 		//close req chan
 		close(f.reqChan)
+		f.closed = true
 	}()
 
 	//loop
@@ -214,10 +215,6 @@ func (f *Queue) runMainProcess() {
 			}
 		case <- f.closeChan:
 			{
-				//update closed switcher
-				f.Lock()
-				f.closed = true
-				f.Unlock()
 				return
 			}
 		}
