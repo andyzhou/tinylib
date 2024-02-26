@@ -199,6 +199,11 @@ func (f *Worker) CastData(data interface{}) error {
 	return nil
 }
 
+//get workers
+func (f *Worker) GetWorkers() int32 {
+	return f.workers
+}
+
 //get son worker
 func (f *Worker) GetRandWorker(
 	dataIds ...int64) (*SonWorker, error) {
@@ -230,7 +235,8 @@ func (f *Worker) GetRandWorker(
 	return nil, errors.New("can't get son worker")
 }
 
-func (f *Worker) GetWorker(workerId int32) (*SonWorker, error) {
+func (f *Worker) GetWorker(
+	workerId int32) (*SonWorker, error) {
 	//check
 	if workerId <= 0 {
 		return nil, errors.New("invalid parameter")
@@ -278,6 +284,21 @@ func (f *SonWorker) Quit() {
 	if f.ticker != nil {
 		f.ticker.Quit()
 	}
+}
+
+//send data
+func (f *SonWorker) SendData(data interface{}) (interface{}, error) {
+	//check
+	if data == nil {
+		return nil, errors.New("invalid parameter")
+	}
+	if f.queue == nil {
+		return nil, errors.New("inter queue not init")
+	}
+
+	//send data to queue
+	resp, err := f.queue.SendData(data)
+	return resp, err
 }
 
 //set cb for gen ticker

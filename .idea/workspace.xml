@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d24bc31b-aa94-4cd8-8167-1655b7f45895" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/queue/define.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/queue/worker.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testing/worker_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/queue/list.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/list.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/queue/queue.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/queue.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/queue/ticker.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/ticker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/queue/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/worker.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
