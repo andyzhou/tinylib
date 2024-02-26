@@ -33,7 +33,8 @@ type (
 //face info
 type Worker struct {
 	//basic
-	workerMap map[int32]*SonWorker
+	workerMap map[int32]*SonWorker //workerId -> *SonWorker
+	workerIdMap map[int64]int32 //dataId -> workerId
 	workers int32
 
 	//cb func
@@ -47,6 +48,7 @@ type Worker struct {
 func NewWorker() *Worker {
 	this := &Worker{
 		workerMap: map[int32]*SonWorker{},
+		workerIdMap: map[int64]int32{},
 	}
 	return this
 }
@@ -160,26 +162,34 @@ func (f *Worker) CreateWorkers(
 //send data to one worker, STEP-3
 //dataIds used for hash calculate value
 func (f *Worker) SendData(
-	data interface{},
-	dataId int64,
-	needResponses ...bool) (interface{}, error) {
+		data interface{},
+		objIds []int64,
+		needResponses ...bool,
+	) (map[int64]interface{}, error) {
 	//check
-	if data == nil {
+	if data == nil || objIds == nil {
 		return nil, errors.New("invalid parameter")
 	}
 	if f.workers <= 0 {
 		return nil, errors.New("no any workers")
 	}
 
-	//get son worker
-	sonWorker, err := f.GetRandWorker(dataId)
-	if err != nil || sonWorker == nil {
-		return nil, err
+	//loop process
+	result := map[int64]interface{}{}
+	for _, objId := range objIds {
+		//get son worker
+		sonWorker, err := f.GetTargetWorker(objId)
+		if err != nil || sonWorker == nil {
+			continue
+		}
+		//send data to queue
+		resp, subErr := sonWorker.queue.SendData(data, needResponses...)
+		if subErr != nil {
+			continue
+		}
+		result[objId] = resp
 	}
-
-	//send data to queue
-	resp, subErr := sonWorker.queue.SendData(data, needResponses...)
-	return resp, subErr
+	return result, nil
 }
 
 //cast data to all workers
@@ -204,31 +214,116 @@ func (f *Worker) GetWorkers() int32 {
 	return f.workers
 }
 
+//get all objs
+func (f *Worker) GetAllBindObj(
+	workerId int32) (map[int64]interface{}, error) {
+	//get target worker by id
+	sonWorker, err := f.GetWorker(workerId)
+	if err != nil || sonWorker == nil {
+		return nil, err
+	}
+	//get all objs
+	objs := sonWorker.GetAllBindObjs()
+	return objs, nil
+}
+
+//get one obj by id
+func (f *Worker) GetBindObj(objId int64) (interface{}, error) {
+	//check
+	if objId <= 0 {
+		return nil, errors.New("invalid parameter")
+	}
+
+	//get target worker
+	sonWorker, err := f.GetTargetWorker(objId)
+	if err != nil || sonWorker == nil {
+		return nil, err
+	}
+
+	//get from son worker
+	obj, subErr := sonWorker.GetBindObj(objId)
+	return obj, subErr
+}
+
+//remove bind obj
+func (f *Worker) RemoveBindObj(objId int64) error {
+	//check
+	if objId <= 0 {
+		return errors.New("invalid parameter")
+	}
+
+	//get target worker
+	sonWorker, err := f.GetTargetWorker(objId)
+	if err != nil || sonWorker == nil {
+		return err
+	}
+
+	//remove from son worker
+	err = sonWorker.RemoveBindObj(objId)
+	if err != nil {
+		return err
+	}
+
+	//remove obj id from cached map
+	f.Lock()
+	defer f.Unlock()
+	delete(f.workerIdMap, objId)
+	return nil
+}
+
+//update bind obj
+func (f *Worker) UpdateBindObj(objId int64, obj interface{}) error {
+	//check
+	if objId <= 0 || obj == nil {
+		return errors.New("invalid parameter")
+	}
+
+	//get target worker
+	sonWorker, err := f.GetTargetWorker(objId)
+	if err != nil || sonWorker == nil {
+		return err
+	}
+
+	//update into son worker
+	err = sonWorker.UpdateBindObj(objId, obj)
+	return err
+}
+
 //get son worker
-func (f *Worker) GetRandWorker(
-	dataIds ...int64) (*SonWorker, error) {
+func (f *Worker) GetTargetWorker(
+	objIds ...int64) (*SonWorker, error) {
 	var (
-		dataId int64
-		hashIdx int32
+		objId int64
+		targetWorkerId int32
 	)
 	//check
-	if dataIds != nil && len(dataIds) > 0 {
-		dataId = dataIds[0]
+	if objIds != nil && len(objIds) > 0 {
+		objId = objIds[0]
 	}
 
 	//gen hashed worker id
-	if dataId <= 0 {
+	f.Lock()
+	defer f.Unlock()
+	if objId <= 0 {
 		//hashed by rand
 		now := time.Now().UnixNano()
 		rand.Seed(now)
-		hashIdx = int32(rand.Int63n(now) % int64(f.workers)) + 1
+		targetWorkerId = int32(rand.Int63n(now) % int64(f.workers)) + 1
 	}else{
-		//hashed by data id
-		hashIdx = int32(rand.Int63n(dataId) % int64(f.workers)) + 1
+		//get from cached map
+		v, ok := f.workerIdMap[objId]
+		if !ok || v <= 0 {
+			//hashed by data id
+			targetWorkerId = int32(rand.Int63n(objId) % int64(f.workers)) + 1
+			//sync into cache map
+			f.workerIdMap[objId] = targetWorkerId
+		}else{
+			targetWorkerId = v
+		}
 	}
 
 	//get target son worker
-	v, ok := f.workerMap[hashIdx]
+	v, ok := f.workerMap[targetWorkerId]
 	if ok && v != nil {
 		return v, nil
 	}
@@ -334,12 +429,28 @@ func (f *SonWorker) SetCBForBindObjTicker(cb func(int32,...interface{}) error) e
 	return nil
 }
 
-//get bind obj
-func (f *SonWorker) GetBindObj() map[int64]interface{} {
+//get all bind objs
+func (f *SonWorker) GetAllBindObjs() map[int64]interface{} {
 	//get with locker
 	f.Lock()
 	defer f.Unlock()
 	return f.bindObjs
+}
+
+//get one bind obj
+func (f *SonWorker) GetBindObj(objId int64) (interface{}, error) {
+	//check
+	if objId <= 0 {
+		return nil, errors.New("invalid parameter")
+	}
+	//get with locker
+	f.Lock()
+	defer f.Unlock()
+	v, ok := f.bindObjs[objId]
+	if ok && v != nil {
+		return v, nil
+	}
+	return nil, errors.New("no such obj by id")
 }
 
 //remove bind obj

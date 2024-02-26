@@ -52,7 +52,7 @@ func bindObjAccess(val int64) (interface{}, error) {
 	}
 
 	//get obj
-	objMap := sonWorker.GetBindObj()
+	objMap := sonWorker.GetAllBindObjs()
 
 	//check or init obj
 	if objMap == nil {
