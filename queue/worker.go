@@ -464,6 +464,9 @@ func (f *SonWorker) RemoveBindObj(objId int64) error {
 	f.Lock()
 	defer f.Unlock()
 	delete(f.bindObjs, objId)
+	if len(f.bindObjs) <= 0 {
+		runtime.GC()
+	}
 	return nil
 }
 
