@@ -2,8 +2,11 @@ package queue
 
 import (
 	"errors"
+	"fmt"
+	"github.com/andyzhou/tinylib/util"
 	"math/rand"
 	"runtime"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -34,7 +37,7 @@ type (
 type Worker struct {
 	//basic
 	workerMap map[int32]*SonWorker //workerId -> *SonWorker
-	workerIdMap map[int64]int32 //dataId -> workerId
+	workerIdMap map[int64]int32 //dataId -> workerId, for bind obj
 	workers int32
 
 	//cb func
@@ -42,6 +45,7 @@ type Worker struct {
 	cbForGenTickerOpt func(int32) error
 	cbForBindObjTickerOpt func(int32,...interface{}) error
 	sync.RWMutex
+	util.Util
 }
 
 //construct
@@ -290,15 +294,28 @@ func (f *Worker) UpdateBindObj(objId int64, obj interface{}) error {
 }
 
 //get son worker
+//extParas -> dataId(int64), needBind(bool)
 func (f *Worker) GetTargetWorker(
-	objIds ...int64) (*SonWorker, error) {
+	extParas ...interface{}) (*SonWorker, error) {
 	var (
 		objId int64
 		targetWorkerId int32
+		needBind bool
 	)
 	//check
-	if objIds != nil && len(objIds) > 0 {
-		objId = objIds[0]
+	if extParas != nil {
+		extParaLen := len(extParas)
+		switch extParaLen {
+		case 1:
+			{
+				objId = f.Str2Int(fmt.Sprintf("%v", extParas[0]))
+			}
+		case 2:
+			{
+				objId = f.Str2Int(fmt.Sprintf("%v", extParas[0]))
+				needBind, _ = strconv.ParseBool(fmt.Sprintf("%v", extParas[0]))
+			}
+		}
 	}
 
 	//gen hashed worker id
@@ -310,15 +327,21 @@ func (f *Worker) GetTargetWorker(
 		rand.Seed(now)
 		targetWorkerId = int32(rand.Int63n(now) % int64(f.workers)) + 1
 	}else{
-		//get from cached map
-		v, ok := f.workerIdMap[objId]
-		if !ok || v <= 0 {
+		//hashed by data id
+		if needBind {
+			//get from cached map
+			v, ok := f.workerIdMap[objId]
+			if !ok || v <= 0 {
+				//hashed by data id
+				targetWorkerId = int32(rand.Int63n(objId) % int64(f.workers)) + 1
+				//sync into cache map
+				f.workerIdMap[objId] = targetWorkerId
+			}else{
+				targetWorkerId = v
+			}
+		}else{
 			//hashed by data id
 			targetWorkerId = int32(rand.Int63n(objId) % int64(f.workers)) + 1
-			//sync into cache map
-			f.workerIdMap[objId] = targetWorkerId
-		}else{
-			targetWorkerId = v
 		}
 	}
 
