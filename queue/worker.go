@@ -70,6 +70,7 @@ func (f *Worker) Quit() {
 }
 
 //set cb for queue opt, STEP-1-1
+//if setup, will open queue
 func (f *Worker) SetCBForQueueOpt(cb func(interface{}) (interface{}, error)) {
 	//check
 	if cb == nil {
@@ -89,6 +90,7 @@ func (f *Worker) SetCBForQueueOpt(cb func(interface{}) (interface{}, error)) {
 }
 
 //set cb for gen ticker opt, STEP-1-2
+//if setup, will open ticker
 func (f *Worker) SetCBForGenTickerOpt(cb func(int32) error) {
 	//check
 	if cb == nil {
@@ -105,6 +107,7 @@ func (f *Worker) SetCBForGenTickerOpt(cb func(int32) error) {
 }
 
 //set cb for bind obj ticker opt, STEP-1-3
+//if setup, used for bind obj ticker opt
 func (f *Worker) SetCBForBindObjTickerOpt(cb func(int32,...interface{}) error) {
 	//check
 	if cb == nil {
@@ -164,7 +167,7 @@ func (f *Worker) CreateWorkers(
 }
 
 //send data to one worker, STEP-3
-//dataIds used for hash calculate value
+//objIds used for hash calculate value
 func (f *Worker) SendData(
 		data interface{},
 		objIds []int64,
