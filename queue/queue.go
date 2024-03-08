@@ -32,7 +32,6 @@ type Queue struct {
 	closeChan chan bool
 	cbForReq func(data interface{}) (interface{}, error)
 	cbForQuit func()
-	closed bool
 	util.Util
 	sync.RWMutex
 }
@@ -86,9 +85,6 @@ func (f *Queue) SendData(
 	//check
 	if data == nil || data == "" {
 		return nil, errors.New("invalid parameter")
-	}
-	if f.closed {
-		return nil, errors.New("inter chan has closed")
 	}
 	if f.reqChan == nil {
 		return nil, errors.New("inter chan is nil")
@@ -195,10 +191,6 @@ func (f *Queue) runMainProcess() {
 		if f.cbForQuit != nil {
 			f.cbForQuit()
 		}
-
-		//close req chan
-		close(f.reqChan)
-		f.closed = true
 	}()
 
 	//loop
