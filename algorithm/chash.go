@@ -32,7 +32,7 @@ type HashRing struct {
 //construct
 func NewHashRingDefault() *HashRing {
 	hf := func(key []byte) uint32 {
-		i, err := strconv.Atoi(string(key))
+		i, err := strconv.ParseInt(string(key), 10, 64)
 		if err != nil {
 			panic(any(err))
 		}
