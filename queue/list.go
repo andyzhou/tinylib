@@ -3,6 +3,7 @@ package queue
 import (
 	"container/list"
 	"errors"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -81,6 +82,7 @@ func (f *List) SetConsumer(cb func(interface{}) error, rates ...float64) {
 //clear
 func (f *List) Clear() {
 	f.l.Init()
+	runtime.GC()
 }
 
 //get length
