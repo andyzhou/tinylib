@@ -3,6 +3,7 @@ package testing
 import (
 	"github.com/andyzhou/tinylib/queue"
 	"math/rand"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -49,6 +50,20 @@ func TestList(t *testing.T) {
 	l.Quit()
 	listLen = l.Len()
 	t.Logf("quit listLen:%v\n", listLen)
+}
+
+func TestPush(t *testing.T) {
+	for i := 0; i < 100000; i++ {
+		pushEle()
+	}
+	for {
+		lLen := getLen()
+		if lLen <= 0 {
+			t.Logf("gc...\n")
+			runtime.GC()
+			break
+		}
+	}
 }
 
 //benchmark

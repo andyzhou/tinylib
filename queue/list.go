@@ -137,6 +137,7 @@ func (f *List) runConsumeProcess(rates ...float64) {
 		rate float64
 		listLen int
 		data *list.Element
+		needGc bool
 	)
 	if rates != nil && len(rates) > 0 {
 		rate = rates[0]
@@ -156,6 +157,10 @@ func (f *List) runConsumeProcess(rates ...float64) {
 		//list data opt
 		listLen = f.l.Len()
 		if listLen <= 0 {
+			if needGc {
+				runtime.GC()
+				needGc = false
+			}
 			time.Sleep(rateDuration)
 			continue
 		}
@@ -164,6 +169,9 @@ func (f *List) runConsumeProcess(rates ...float64) {
 		data = f.l.Front()
 		if data.Value != nil {
 			f.cbForConsumer(data.Value)
+			if !needGc {
+				needGc = true
+			}
 		}
 		f.l.Remove(data)
 	}
