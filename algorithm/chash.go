@@ -59,6 +59,8 @@ func (m *HashRing) IsEmpty() bool {
 }
 
 // Add adds some nodes to the hash.
+//node value should be numeric string format
+//like "1", "2", etc.
 func (m *HashRing) Add(nodes ...string) {
 	m.Lock()
 	defer m.Unlock()

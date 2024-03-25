@@ -14,8 +14,6 @@ import (
  * @mail <diudiu8848@163.com>
  */
 
-
-
 //inter type
 type (
 	interReq struct {
