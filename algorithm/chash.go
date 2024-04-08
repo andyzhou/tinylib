@@ -109,3 +109,10 @@ func (m *HashRing) Get(key string) string {
 	defer m.Unlock()
 	return m.hashMap[m.ring[idx]]
 }
+
+//get all
+func (m *HashRing) GetAll() map[int]string {
+	m.Lock()
+	defer m.Unlock()
+	return m.hashMap
+}

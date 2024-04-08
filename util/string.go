@@ -18,6 +18,12 @@ import (
 type String struct {
 }
 
+//remove html tag
+func (f *String) RemoveHtmlTag(html string) string {
+	re, _ := regexp.Compile("<.*?>")
+	return re.ReplaceAllString(html, "")
+}
+
 //convert slice to string
 func (f *String) Slice2Str(
 	orgSlice []string,
