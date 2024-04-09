@@ -58,32 +58,24 @@ func (m *HashRing) IsEmpty() bool {
 	return len(m.ring) == 0
 }
 
-// Add adds some nodes to the hash.
-//node value should be numeric string format
-//like "1", "2", etc.
-func (m *HashRing) Add(nodes ...string) {
+//get ring length
+func (m *HashRing) GetRingLen() int {
+	return len(m.ring)
+}
+
+//get by idx
+func (m *HashRing) GetByIdx(idx int) string {
+	//check
+	if idx < 0 {
+		return ""
+	}
+	ringLen := len(m.ring)
+	if ringLen <= 0 || idx >= ringLen {
+		return ""
+	}
 	m.Lock()
 	defer m.Unlock()
-	for _, node := range nodes {
-		//check node
-		_, ok := m.nodes[node]
-		if ok {
-			continue
-		}
-		m.nodes[node] = true
-
-		//create batch replicas node
-		for i := 0; i < m.replicas; i++ {
-			//cal virtual hash value
-			hash := int(m.hash([]byte(strconv.Itoa(i) + node)))
-			//add into hash ring
-			m.ring = append(m.ring, hash)
-			//map the hash value and node info
-			m.hashMap[hash] = node
-		}
-	}
-	//sort hash ring
-	sort.Ints(m.ring)
+	return m.hashMap[m.ring[idx]]
 }
 
 // Get gets the closest item in the hash to the provided key.
@@ -115,4 +107,32 @@ func (m *HashRing) GetAll() map[int]string {
 	m.Lock()
 	defer m.Unlock()
 	return m.hashMap
+}
+
+// Add adds some nodes to the hash.
+//node value should be numeric string format
+//like "1", "2", etc.
+func (m *HashRing) Add(nodes ...string) {
+	m.Lock()
+	defer m.Unlock()
+	for _, node := range nodes {
+		//check node
+		_, ok := m.nodes[node]
+		if ok {
+			continue
+		}
+		m.nodes[node] = true
+
+		//create batch replicas node
+		for i := 0; i < m.replicas; i++ {
+			//cal virtual hash value
+			hash := int(m.hash([]byte(strconv.Itoa(i) + node)))
+			//add into hash ring
+			m.ring = append(m.ring, hash)
+			//map the hash value and node info
+			m.hashMap[hash] = node
+		}
+	}
+	//sort hash ring
+	sort.Ints(m.ring)
 }
