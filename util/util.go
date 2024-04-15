@@ -2,7 +2,9 @@ package util
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/gob"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -25,6 +27,16 @@ const (
 
 //face info
 type Util struct {
+}
+
+//gen md5 string
+func (f *Util) GenMd5(orgString string) string {
+	if len(orgString) <= 0 {
+		return ""
+	}
+	m := md5.New()
+	m.Write([]byte(orgString))
+	return hex.EncodeToString(m.Sum(nil))
 }
 
 //check chan is closed or not
