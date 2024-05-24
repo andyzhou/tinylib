@@ -19,6 +19,7 @@ var (
 type Web struct {
 	app *App
 	cookie *Cookie
+	page *Page
 	Base
 }
 
@@ -35,6 +36,7 @@ func NewWeb() *Web {
 	this := &Web{
 		app: NewApp(),
 		cookie: NewCookie(),
+		page: NewPage(),
 	}
 	return this
 }
@@ -45,4 +47,7 @@ func (f *Web) GetApp() *App {
 }
 func (f *Web) GetCookie() *Cookie {
 	return f.cookie
+}
+func (f *Web) GetPage() *Page {
+	return f.page
 }

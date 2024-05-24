@@ -4,8 +4,10 @@ import (
 	"errors"
 	"github.com/andyzhou/tinylib/queue"
 	"github.com/andyzhou/tinylib/util"
+	"github.com/andyzhou/tinylib/web"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 )
@@ -154,6 +156,35 @@ func testWorker() {
 	log.Printf("test bind obj ticker succeed\n")
 }
 
+//test page
+func testPage() {
+	//init obj
+	page := web.NewPage()
+
+	//setup config
+	pageCfg := &web.PageConfig{
+		TplPath: ".",
+		StaticPath: ".",
+	}
+	page.SetConfig(pageCfg)
+
+	//parse main tpl
+	tpl, err := page.ParseTpl("test.tpl")
+	if err != nil {
+		log.Printf("err:%v\n", err.Error())
+		os.Exit(1)
+	}
+
+	//get tpl page
+	content, subErr := page.GetTplContent(tpl, nil)
+	log.Printf("content:%v, err:%v\n", content, subErr)
+
+	//gen html page
+	pagePath := "test.html"
+	err = page.GenHtmlPage(tpl, pagePath)
+	log.Printf("err:%v\n", err)
+}
+
 func main() {
 	var (
 		//wg sync.WaitGroup
@@ -164,7 +195,7 @@ func main() {
 	//testChanIsClosed()
 	//testQueue()
 	//testTick()
-	testWorker()
-
+	//testWorker()
+	//testPage()
 	//wg.Wait()
 }
