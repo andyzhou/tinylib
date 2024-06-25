@@ -491,6 +491,8 @@ func (f *SonWorker) RemoveBindObj(objId int64) error {
 	defer f.Unlock()
 	delete(f.bindObjs, objId)
 	if len(f.bindObjs) <= 0 {
+		//init new and gc memory
+		f.bindObjs = map[int64]interface{}{}
 		runtime.GC()
 	}
 	return nil
