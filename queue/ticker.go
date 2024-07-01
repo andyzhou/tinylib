@@ -24,7 +24,7 @@ type Ticker struct {
 }
 
 //construct
-//realDur := tickDuration * time.Second
+//tickDurations -> seconds value, default 1 second
 func NewTicker(tickDurations ...float64) *Ticker {
 	//check and set ticker rate
 	defaultDuration := float64(1) //default 1 second

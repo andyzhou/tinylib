@@ -107,7 +107,8 @@ func testQueue() {
 //test tick
 func testTick() {
 	//init tick
-	t := queue.NewTicker()
+	duration := float64(1) //1 second
+	t := queue.NewTicker(duration)
 
 	//set callback
 	cbForQuit := func() {
@@ -118,6 +119,7 @@ func testTick() {
 		return nil
 	}
 
+	//set callback
 	t.SetCheckerCallback(cbForCheckOpt)
 	t.SetQuitCallback(cbForQuit)
 
@@ -125,7 +127,7 @@ func testTick() {
 	delayOpt := func() {
 		t.Quit()
 	}
-	time.AfterFunc(time.Second * 2, delayOpt)
+	time.AfterFunc(time.Second * 5, delayOpt)
 }
 
 //test worker
@@ -187,9 +189,9 @@ func testPage() {
 
 func main() {
 	var (
-		//wg sync.WaitGroup
+		wg sync.WaitGroup
 	)
-	//wg.Add(1)
+	wg.Add(1)
 
 	//test code
 	//testChanIsClosed()
@@ -197,5 +199,5 @@ func main() {
 	//testTick()
 	//testWorker()
 	//testPage()
-	//wg.Wait()
+	wg.Wait()
 }
