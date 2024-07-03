@@ -104,6 +104,16 @@ func testQueue() {
 	time.AfterFunc(time.Second * 2, delayOpt)
 }
 
+//test list
+func cbForListConsumer(data interface{}) error {
+	return nil
+}
+func testList() {
+	//init list
+	l := queue.NewList()
+	l.SetConsumer(cbForListConsumer, 0.2)
+}
+
 //test tick
 func testTick() {
 	//init tick
@@ -127,7 +137,7 @@ func testTick() {
 	delayOpt := func() {
 		t.Quit()
 	}
-	time.AfterFunc(time.Second * 5, delayOpt)
+	time.AfterFunc(time.Second * 60, delayOpt)
 }
 
 //test worker
@@ -196,6 +206,7 @@ func main() {
 	//test code
 	//testChanIsClosed()
 	//testQueue()
+	testList()
 	//testTick()
 	//testWorker()
 	//testPage()

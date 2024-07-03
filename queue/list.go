@@ -5,6 +5,7 @@ import (
 	"errors"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -18,6 +19,7 @@ import (
 type List struct {
 	l *list.List
 	cbForConsumer func(interface{}) error
+	enumCount int64
 	closed bool
 	sync.RWMutex
 }
@@ -68,6 +70,7 @@ func (f *List) Quit(forces ...bool) {
 }
 
 //set consumer
+//real duration = rate * time.second
 func (f *List) SetConsumer(cb func(interface{}) error, rates ...float64) {
 	//check
 	if cb == nil || f.cbForConsumer != nil {
@@ -82,12 +85,13 @@ func (f *List) SetConsumer(cb func(interface{}) error, rates ...float64) {
 //clear
 func (f *List) Clear() {
 	f.l.Init()
+	atomic.StoreInt64(&f.enumCount, 0)
 	runtime.GC()
 }
 
 //get length
-func (f *List) Len() int {
-	return f.l.Len()
+func (f *List) Len() int64 {
+	return f.enumCount
 }
 
 //get element value
@@ -97,15 +101,33 @@ func (f *List) GetVal(e *list.Element) interface{} {
 
 //pop head
 func (f *List) Pop() *list.Element {
+	if f.enumCount <= 0 {
+		return nil
+	}
 	ele := f.l.Front()
-	defer f.l.Remove(ele)
+	defer func() {
+		f.l.Remove(ele)
+		atomic.AddInt64(&f.enumCount, -1)
+		if f.enumCount < 0 {
+			atomic.StoreInt64(&f.enumCount, 0)
+		}
+	}()
 	return ele
 }
 
 //pop tail
 func (f *List) Tail() *list.Element {
+	if f.enumCount <= 0 {
+		return nil
+	}
 	ele := f.l.Back()
-	defer f.l.Remove(ele)
+	defer func() {
+		f.l.Remove(ele)
+		atomic.AddInt64(&f.enumCount, -1)
+		if f.enumCount < 0 {
+			atomic.StoreInt64(&f.enumCount, 0)
+		}
+	}()
 	return ele
 }
 
@@ -115,6 +137,7 @@ func (f *List) Join(val interface{}) error {
 		return errors.New("invalid parameter")
 	}
 	f.l.PushFront(val)
+	atomic.AddInt64(&f.enumCount, 1)
 	return nil
 }
 
@@ -124,6 +147,7 @@ func (f *List) Push(val interface{}) error {
 		return errors.New("invalid parameter")
 	}
 	f.l.PushBack(val)
+	atomic.AddInt64(&f.enumCount, 1)
 	return nil
 }
 
@@ -135,7 +159,6 @@ func (f *List) Push(val interface{}) error {
 func (f *List) runConsumeProcess(rates ...float64) {
 	var (
 		rate float64
-		listLen int
 		data *list.Element
 		needGc bool
 	)
@@ -145,7 +168,8 @@ func (f *List) runConsumeProcess(rates ...float64) {
 	if rate <= 0 {
 		rate = DefaultListConsumeRate
 	}
-	rateDuration := time.Duration(rate) * time.Second
+
+	rateDuration := time.Duration(int64(rate * float64(time.Second)))
 
 	//loop
 	for {
@@ -155,8 +179,7 @@ func (f *List) runConsumeProcess(rates ...float64) {
 		}
 
 		//list data opt
-		listLen = f.l.Len()
-		if listLen <= 0 {
+		if f.enumCount <= 0 {
 			if needGc {
 				runtime.GC()
 				needGc = false
@@ -174,6 +197,10 @@ func (f *List) runConsumeProcess(rates ...float64) {
 			}
 		}
 		f.l.Remove(data)
+		atomic.AddInt64(&f.enumCount, -1)
+		if f.enumCount < 0 {
+			atomic.StoreInt64(&f.enumCount, 0)
+		}
 	}
 }
 
