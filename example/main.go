@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/andyzhou/tinylib/algorithm"
 	"github.com/andyzhou/tinylib/queue"
 	"github.com/andyzhou/tinylib/util"
 	"github.com/andyzhou/tinylib/web"
@@ -197,6 +198,41 @@ func testPage() {
 	log.Printf("err:%v\n", err)
 }
 
+//test c-hash
+func testCHash()  {
+	hashRing := algorithm.NewHashRingDefault()
+
+	//add nodes
+	hashRing.Add("0", "2", "3", "4")
+
+	//get ring len
+	ringLen := hashRing.GetRingLen()
+	log.Printf("ringLen:%v\n", ringLen)
+
+	//get all rings
+	allRings := hashRing.GetRings()
+	log.Printf("allRings:%v\n", allRings)
+
+	//get ring by idx
+	targetRing := hashRing.GetByIdx(0)
+	log.Printf("targetRing:%v\n", targetRing)
+
+	//get idx by ring
+	ringIdx := hashRing.GetIdxByRing("0")
+	log.Printf("ringIdx:%v\n", ringIdx)
+
+	//get next ring
+	nextRing := hashRing.GetNextRing("4")
+	log.Printf("nextRing:%v\n", nextRing)
+
+	//get first ring
+	firstRing := hashRing.GetFirstRing()
+	log.Printf("firstRing:%v\n", firstRing)
+
+	rr := hashRing.Get("111")
+	log.Printf("rr:%v\n", rr)
+}
+
 func main() {
 	var (
 		wg sync.WaitGroup
@@ -206,9 +242,10 @@ func main() {
 	//test code
 	//testChanIsClosed()
 	//testQueue()
-	testList()
+	//testList()
 	//testTick()
 	//testWorker()
 	//testPage()
+	testCHash()
 	wg.Wait()
 }

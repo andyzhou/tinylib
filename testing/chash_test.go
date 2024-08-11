@@ -14,7 +14,7 @@ func init() {
 }
 
 func TestCHash(t *testing.T) {
-	//add nods
+	//add nodes
 	hashRing.Add("8", "6", "4", "2")
 
 	//setup test cases
