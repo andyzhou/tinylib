@@ -22,7 +22,7 @@ func cbForConsume(data interface{}) error {
 	return nil
 }
 
-func getLen() int {
+func getLen() int64 {
 	return l.Len()
 }
 

@@ -14,7 +14,7 @@ import (
 
 //inter macro define
 const (
-	DefaultRingReplicas = 3
+	DefaultRingReplicas = 32
 )
 
 type Hash func(data []byte) uint32
@@ -162,6 +162,7 @@ func (m *HashRing) Get(key string) string {
 	m.Lock()
 	defer m.Unlock()
 	return m.hashMap[m.ring[idx]]
+	//return m.hashMap[m.ring[idx%len(m.ring)]]
 }
 
 //get all

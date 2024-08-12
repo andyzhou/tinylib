@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/andyzhou/tinylib/algorithm"
 	"github.com/andyzhou/tinylib/queue"
 	"github.com/andyzhou/tinylib/util"
@@ -203,34 +204,169 @@ func testCHash()  {
 	hashRing := algorithm.NewHashRingDefault()
 
 	//add nodes
-	hashRing.Add("0", "2", "3", "4")
+	hashRing.Add("0", "1")
 
-	//get ring len
-	ringLen := hashRing.GetRingLen()
-	log.Printf("ringLen:%v\n", ringLen)
+	////get ring len
+	//ringLen := hashRing.GetRingLen()
+	//log.Printf("ringLen:%v\n", ringLen)
+	//
+	////get all rings
+	//allRings := hashRing.GetRings()
+	//log.Printf("allRings:%v\n", allRings)
+	//
+	////get ring by idx
+	//targetRing := hashRing.GetByIdx(0)
+	//log.Printf("targetRing:%v\n", targetRing)
+	//
+	////get idx by ring
+	//ringIdx := hashRing.GetIdxByRing("0")
+	//log.Printf("ringIdx:%v\n", ringIdx)
+	//
+	////get next ring
+	//nextRing := hashRing.GetNextRing("4")
+	//log.Printf("nextRing:%v\n", nextRing)
+	//
+	////get first ring
+	//firstRing := hashRing.GetFirstRing()
+	//log.Printf("firstRing:%v\n", firstRing)
 
-	//get all rings
-	allRings := hashRing.GetRings()
-	log.Printf("allRings:%v\n", allRings)
 
-	//get ring by idx
-	targetRing := hashRing.GetByIdx(0)
-	log.Printf("targetRing:%v\n", targetRing)
+	log.Printf("\n====1====\n")
+	for i := 0; i < 30; i++ {
+		tr := hashRing.Get(fmt.Sprintf("%v", i))
+		log.Printf("i:%v, tr:%v\n", i, tr)
+	}
 
-	//get idx by ring
-	ringIdx := hashRing.GetIdxByRing("0")
-	log.Printf("ringIdx:%v\n", ringIdx)
+	//log.Printf("===2===\n")
+	//hashRing.Add("3")
+	//for i := 0; i < 10; i++ {
+	//	tr := hashRing.Get(fmt.Sprintf("%v", i))
+	//	log.Printf("i:%v, tr:%v\n", i, tr)
+	//}
+}
 
-	//get next ring
-	nextRing := hashRing.GetNextRing("4")
-	log.Printf("nextRing:%v\n", nextRing)
+//test phash
+func testPHash() {
+	//init hash
+	hash := algorithm.NewConsistentHash()
 
-	//get first ring
-	firstRing := hashRing.GetFirstRing()
-	log.Printf("firstRing:%v\n", firstRing)
+	//add node
+	hash.Add("0")
+	hash.Add("1")
 
-	rr := hashRing.Get("111")
-	log.Printf("rr:%v\n", rr)
+	log.Printf("\n====1====\n")
+	for i := 0; i < 10; i++ {
+		node, _ := hash.Get(i)
+		log.Printf("i:%v, node:%v\n", i, node)
+	}
+
+	hash.Add("2")
+	log.Printf("\n====2====\n")
+	for i := 0; i < 10; i++ {
+		node, _ := hash.Get(i)
+		log.Printf("i:%v, node:%v\n", i, node)
+	}
+}
+
+//test ring
+func testRing() {
+	ring := algorithm.NewRing()
+	ring.AddNodes("1:7700", "2:7701", "3:7703", "4:7704")
+	log.Printf("\n====1====\n")
+	for i := 0; i < 30; i++ {
+		v, _ := ring.GetNode(fmt.Sprintf("%v", i))
+		log.Printf("i:%v, v:%v\n", i, v)
+	}
+
+	//ring.AddNodeWithWeight("3:7703", 1)
+	//log.Printf("====2====\n")
+	//for i := 0; i < 50; i++ {
+	//	v, _ := ring.GetNode(fmt.Sprintf("%v", i))
+	//	log.Printf("i:%v, v:%v\n", i, v)
+	//}
+}
+
+//test consistent
+func testConsistent() {
+	// Create a new consistent instance
+	cfg := algorithm.Config{
+		PartitionCount:    7,
+		ReplicationFactor: 20,
+		Load:              1.25,
+		Hasher:            algorithm.MyHasher{},
+	}
+
+	//init object
+	c := algorithm.NewConsistent(nil, cfg)
+
+	// Add some members to the consistent hash table.
+	// Add function calculates average load and distributes partitions over members
+	node1 := algorithm.NewNode("1")
+	c.Add(node1)
+
+	node2 := algorithm.NewNode("3")
+	c.Add(node2)
+
+	log.Printf("====1====\n")
+	for i := 0; i < 10; i++ {
+		key := []byte(fmt.Sprintf("%v", i))
+		owner := c.LocateKey(key)
+		log.Printf("i:%v, owner:%v\n", i, owner.String())
+	}
+
+	node3 := algorithm.NewNode("2")
+	c.Add(node3)
+
+	//node4 := myMember("3")
+	//c.Add(node4)
+
+	log.Printf("====2====\n")
+	for i := 0; i < 10; i++ {
+		key := []byte(fmt.Sprintf("%v", i))
+		owner := c.LocateKey(key)
+		log.Printf("i:%v, owner:%v\n", i, owner.String())
+	}
+
+	members := c.GetMembers()
+	log.Printf("members:%v\n", members)
+	for _, member := range members {
+		log.Printf("member:%v\n", member.String())
+	}
+
+	average := c.AverageLoad()
+	log.Printf("average:%v\n", average)
+
+	disMap := c.LoadDistribution()
+	log.Printf("disMap:%v\n", disMap)
+}
+
+//test x hash, stable!!
+func testXHash() {
+	//obj init
+	consistentHash := algorithm.NewXConsistent()
+
+	//add node with virual nodes count
+	consistentHash.Add("0")
+	consistentHash.Add("1")
+	consistentHash.Add("2")
+
+	//get all nodes
+	nodes := consistentHash.GetOrgNodes()
+	log.Printf("nodes:%v\n", nodes)
+
+	//get target nodes
+	log.Printf("====1====\n")
+	for i := 1; i <= 10; i++ {
+		node := consistentHash.GetNode(fmt.Sprintf("%v", i))
+		log.Printf("i:%v, node:%v\n", i, node)
+	}
+
+	consistentHash.Add("3")
+	log.Printf("====2====\n")
+	for i := 11; i <= 50; i++ {
+		node := consistentHash.GetNode(fmt.Sprintf("%v", i))
+		log.Printf("i:%v, node:%v\n", i, node)
+	}
 }
 
 func main() {
@@ -246,6 +382,10 @@ func main() {
 	//testTick()
 	//testWorker()
 	//testPage()
-	testCHash()
+	//testCHash()
+	//testPHash()
+	//testConsistent()
+	//testRing()
+	testXHash()
 	wg.Wait()
 }
