@@ -20,13 +20,13 @@ func NewBaseJson() *BaseJson {
 	return this
 }
 
-////for fix redis!!!!
-//func (j BaseJson) MarshalBinary() ([]byte, error) {
-//	return json.Marshal(j)
-//}
-//func (j BaseJson) UnmarshalBinary(data []byte) error {
-//	return json.Unmarshal(data, j)
-//}
+//for fix redis!!!!
+func (j BaseJson) MarshalBinary() ([]byte, error) {
+	return json.Marshal(j)
+}
+func (j BaseJson) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, j)
+}
 
 //decode map obj to json obj
 func (j *BaseJson) DecodeMap2JsonObj(
