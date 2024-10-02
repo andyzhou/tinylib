@@ -196,3 +196,15 @@ func (f *Util) GetRandomVal(maxVal int) int {
 func (f *Util) GetRealRandomVal(maxVal int) int {
 	return int(rand.Float64() * 1000) % (maxVal)
 }
+
+//shuffle objs
+func (f *Util) Shuffle(slice interface{}) {
+	rand.Seed(time.Now().UnixNano())
+	rv := reflect.ValueOf(slice)
+	swap := reflect.Swapper(slice)
+	length := rv.Len()
+	for i := length - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		swap(i, j)
+	}
+}
