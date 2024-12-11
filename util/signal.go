@@ -33,14 +33,14 @@ const (
 
 //face info
 type Signal struct {
-	SIGTERM  int32
-	SIGINT   int32
-	waitSeconds int
+	SIGTERM      int32
+	SIGINT       int32
+	waitSeconds  int
 	shutDownChan chan bool //refer chan slice
-	ch chan os.Signal
-	stopSig chan bool
-	cbForQuit func()
-	initDone bool
+	ch           chan os.Signal
+	stopSig      chan bool
+	cbForQuit    func()
+	initDone     bool
 }
 
 //construct, step-1

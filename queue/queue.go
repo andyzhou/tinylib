@@ -26,9 +26,9 @@ type (
 //face info
 type Queue struct {
 	queueSize int
-	reqChan chan interReq
+	reqChan   chan interReq
 	closeChan chan bool
-	cbForReq func(data interface{}) (interface{}, error)
+	cbForReq  func(data interface{}) (interface{}, error)
 	cbForQuit func()
 	util.Util
 	sync.RWMutex

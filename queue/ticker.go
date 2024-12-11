@@ -16,10 +16,10 @@ import (
 //face info
 type Ticker struct {
 	tickDuration time.Duration
-	tickChan chan struct{}
-	closeChan chan bool
+	tickChan     chan struct{}
+	closeChan    chan bool
 	cbForChecker func() error
-	cbForQuit func()
+	cbForQuit    func()
 	util.Util
 }
 

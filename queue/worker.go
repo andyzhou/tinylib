@@ -36,14 +36,14 @@ type (
 //face info
 type Worker struct {
 	//basic
-	workerMap map[int32]*SonWorker //workerId -> *SonWorker
-	workerIdMap map[int64]int32 //dataId -> workerId, for bind obj
-	workers int32
+	workerMap   map[int32]*SonWorker //workerId -> *SonWorker
+	workerIdMap map[int64]int32      //dataId -> workerId, for bind obj
+	workers     int32
 
 	//cb func
-	cbForQueueOpt func(interface{})(interface{}, error)
-	cbForGenTickerOpt func(int32) error
-	cbForBindObjTickerOpt func(int32,...interface{}) error
+	cbForQueueOpt         func(interface{}) (interface{}, error)
+	cbForGenTickerOpt     func(int32) error
+	cbForBindObjTickerOpt func(int32, ...interface{}) error
 	sync.RWMutex
 	util.Util
 }

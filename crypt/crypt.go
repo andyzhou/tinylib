@@ -9,8 +9,8 @@ package crypt
 //face info
 type Crypt struct {
 	simple *SimpleEncrypt
-	jwt *Jwt
-	rsa *Rsa
+	jwt    *Jwt
+	rsa    *Rsa
 }
 
 //construct

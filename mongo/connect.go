@@ -13,9 +13,9 @@ import (
 
 //face info
 type Connection struct {
-	client *mongo.Client
-	db     *mongo.Database
-	config *Config
+	client      *mongo.Client
+	db          *mongo.Database
+	config      *Config
 	optionSlice []*options.ClientOptions
 }
 

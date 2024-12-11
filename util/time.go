@@ -16,11 +16,11 @@ import (
 //macro define
 const (
 	//seconds
-	OneMinSec = 60
-	OneHourSec = OneMinSec * 60
-	OneDaySec = OneHourSec * 24
+	OneMinSec   = 60
+	OneHourSec  = OneMinSec * 60
+	OneDaySec   = OneHourSec * 24
 	OneMonthSec = OneDaySec * 30
-	OneYearSec = OneMonthSec * 12
+	OneYearSec  = OneMonthSec * 12
 
 	//general
 	TimeLayoutStr = "2006-01-02 15:04:05"

@@ -27,9 +27,9 @@ type Base struct {
 
 //download data as file
 func (f *Base) DownloadAsFile(
-		downloadName string,
-		data []byte,
-		ctx gin.Context) error {
+	downloadName string,
+	data []byte,
+	ctx gin.Context) error {
 	//check
 	if downloadName == "" || data == nil {
 		return errors.New("invalid parameter")

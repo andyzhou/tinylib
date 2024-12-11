@@ -22,11 +22,11 @@ const (
 
 //face info
 type LogService struct {
-	path string //log root path
-	prefix string //log file prefix
-	outFile *os.File //file handler
-	lastDay string //last day for change file
-	lastHour string //last hour for change file
+	path      string    //log root path
+	prefix    string    //log file prefix
+	outFile   *os.File  //file handler
+	lastDay   string    //last day for change file
+	lastHour  string    //last hour for change file
 	closeChan chan bool //chan for close process
 	sync.RWMutex
 }

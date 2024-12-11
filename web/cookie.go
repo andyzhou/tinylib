@@ -22,8 +22,8 @@ const (
 //face info
 type Cookie struct {
 	hashKey, blockKey string
-	secureCookie *securecookie.SecureCookie `secure cookie instance`
-	expireTime int
+	secureCookie      *securecookie.SecureCookie `secure cookie instance`
+	expireTime        int
 }
 
 //construct

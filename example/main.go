@@ -369,6 +369,16 @@ func testXHash() {
 	}
 }
 
+//test date time
+func testDateTime() {
+	//t := util.Time{}
+	now := time.Now().Unix()
+	t := time.Unix(now, 0)
+	//dayFormat := t.TimeStampToDayStr(now, 2)
+	dd := t.Format(time.ANSIC)
+	log.Printf("dd:%v\n", dd)
+}
+
 func main() {
 	var (
 		wg sync.WaitGroup
@@ -386,6 +396,7 @@ func main() {
 	//testPHash()
 	//testConsistent()
 	//testRing()
-	testXHash()
+	//testXHash()
+	testDateTime()
 	wg.Wait()
 }

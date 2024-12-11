@@ -8,7 +8,7 @@ package config
 
 //main face
 type Config struct {
-	ini *IniConfig
+	ini  *IniConfig
 	json *JsonConfig
 }
 

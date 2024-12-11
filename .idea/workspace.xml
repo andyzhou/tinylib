@@ -6,7 +6,32 @@
   <component name="ChangeListManager">
     <list default="true" id="d24bc31b-aa94-4cd8-8167-1655b7f45895" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/cmd.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/cmd.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/ini.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/ini.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/json.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/json.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/subconf.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/subconf.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypt/crypt.go" beforeDir="false" afterPath="$PROJECT_DIR$/crypt/crypt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypt/define.go" beforeDir="false" afterPath="$PROJECT_DIR$/crypt/define.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypt/jwt.go" beforeDir="false" afterPath="$PROJECT_DIR$/crypt/jwt.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mongo/connect.go" beforeDir="false" afterPath="$PROJECT_DIR$/mongo/connect.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/queue/list.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/list.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/queue/queue.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/queue.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/queue/ticker.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/ticker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/queue/worker.go" beforeDir="false" afterPath="$PROJECT_DIR$/queue/worker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/redis/pubsub.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/pubsub.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/redis.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/dfa.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/dfa.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/http.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/signal.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/signal.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/time.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/time.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/app.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/base.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/cookie.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/cookie.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/page.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/page.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/web.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/web.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

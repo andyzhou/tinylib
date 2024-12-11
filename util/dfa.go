@@ -19,9 +19,9 @@ const (
 //face info
 type DFA struct {
 	sensitiveWord map[string]interface{}
-	set map[string]interface{}
-	invalidWords []string
-	invalidWord map[string]interface{}
+	set           map[string]interface{}
+	invalidWords  []string
+	invalidWord   map[string]interface{}
 	sync.RWMutex
 }
 

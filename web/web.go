@@ -17,9 +17,9 @@ var (
 
 //face info
 type Web struct {
-	app *App
+	app    *App
 	cookie *Cookie
-	page *Page
+	page   *Page
 	Base
 }
 

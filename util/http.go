@@ -52,20 +52,20 @@ type HttpResp struct {
 
 //http request face info
 type HttpReq struct {
-	Kind int `GET or POST`
-	Url string
-	Headers map[string]string
-	Params map[string]interface{}
-	FilePara HttpFilePara
-	Body []byte
-	ReceiverChan chan HttpResp `http request receiver chan`
-	IsAsync bool
+	Kind         int //GET or POST
+	Url          string
+	Headers      map[string]string
+	Params       map[string]interface{}
+	FilePara     HttpFilePara
+	Body         []byte
+	ReceiverChan chan HttpResp //http request receiver chan
+	IsAsync      bool
 }
 
 //http face
 type HttpClient struct {
-	client *http.Client `http client instance`
-	reqChan chan HttpReq `request lazy chan`
+	client    *http.Client `http client instance`
+	reqChan   chan HttpReq `request lazy chan`
 	closeChan chan bool
 	sync.RWMutex
 }

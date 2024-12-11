@@ -23,8 +23,8 @@ type PageConfig struct {
 
 //face info
 type Page struct {
-	cfg *PageConfig
-	extFuncMap map[string]interface{}
+	cfg           *PageConfig
+	extFuncMap    map[string]interface{}
 	shareTplFiles []string
 	sync.RWMutex
 }

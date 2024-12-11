@@ -13,9 +13,9 @@ import (
 
 //face info
 type Jwt struct {
-	secret string `secret key string`
-	token *jwt.Token `jwt token instance`
-	claims jwt.MapClaims `jwt claims object`
+	secret string        //secret key string
+	token  *jwt.Token    //jwt token instance
+	claims jwt.MapClaims //jwt claims object
 }
 
 //construct

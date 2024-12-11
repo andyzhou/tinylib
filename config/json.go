@@ -17,7 +17,7 @@ import (
 //define config struct
 type JsonConfig struct {
 	cfgRootPath string
-	kv map[string]interface{}
+	kv          map[string]interface{}
 	sync.RWMutex
 }
 

@@ -25,10 +25,10 @@ type IWebSubApp interface {
 
 //face info
 type App struct {
-	port int //web port
-	server *gin.Engine //gin server
-	tplPattern string //tpl pattern
-	wg sync.WaitGroup
+	port       int         //web port
+	server     *gin.Engine //gin server
+	tplPattern string      //tpl pattern
+	wg         sync.WaitGroup
 }
 
 //construct

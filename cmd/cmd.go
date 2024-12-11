@@ -14,8 +14,8 @@ import (
 
 //face info
 type Cmd struct {
-	app *cli.App
-	flag *Flag
+	app       *cli.App
+	flag      *Flag
 	isRunning bool
 }
 

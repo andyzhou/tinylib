@@ -17,10 +17,10 @@ import (
 
 //face info
 type List struct {
-	l *list.List
+	l             *list.List
 	cbForConsumer func(interface{}) error
-	enumCount int64
-	closed bool
+	enumCount     int64
+	closed        bool
 	sync.RWMutex
 }
 

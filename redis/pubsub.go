@@ -22,7 +22,7 @@ type (
 
 //face info
 type PubSub struct {
-	conn *Connection //reference
+	conn    *Connection              //reference
 	chanMap map[string]chan struct{} //channel -> chan struct{}
 	timeout time.Duration
 	sync.RWMutex

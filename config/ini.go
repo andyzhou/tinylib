@@ -15,8 +15,8 @@ import (
 //face info
 type IniConfig struct {
 	cfgRootPath string
-	cfgMap map[string]*File //tag -> *File
-	autoReload bool
+	cfgMap      map[string]*File //tag -> *File
+	autoReload  bool
 	sync.RWMutex
 }
 

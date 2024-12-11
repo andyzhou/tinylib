@@ -19,13 +19,13 @@ const (
 
 //sub config info
 type SubConfig struct {
-	confFile string
+	confFile      string
 	confCheckRate int
-	cbForAnalyze func(map[string]interface{}) bool `CB for analyze config`
-	conf *JsonConfig `config instance`
-	confMap map[string]interface{}
-	lastTime int64 `last update time`
-	closeChan chan bool
+	cbForAnalyze  func(map[string]interface{}) bool //CB for analyze config
+	conf          *JsonConfig                       //config instance
+	confMap       map[string]interface{}
+	lastTime      int64 //last update time
+	closeChan     chan bool
 }
 
 //construct

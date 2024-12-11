@@ -15,7 +15,7 @@ import (
 //face info
 type Redis struct {
 	connMap sync.Map //dbTag -> *Connection
-	pubSub *PubSub
+	pubSub  *PubSub
 	sync.RWMutex
 }
 
