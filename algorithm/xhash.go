@@ -15,20 +15,11 @@ const (
 
 //face info
 type XConsistent struct {
-	//排序的hash虚拟结点
-	hashSortedNodes []uint32
-
-	//虚拟结点对应的结点信息
-	circle map[uint32]string
-
-	//已绑定的结点
-	nodes map[string]bool
-	orgNodes []string
-
-	//虚拟结点数
+	hashSortedNodes  []uint32
+	circle           map[uint32]string
+	nodes            map[string]bool
+	orgNodes         []string
 	virtualNodeCount int
-
-	//map读写锁
 	sync.RWMutex
 }
 

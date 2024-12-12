@@ -11,8 +11,7 @@ import (
 
 const (
 	// TopWeight is the top weight that one entry might set.
-	TopWeight = 100
-
+	TopWeight   = 100
 	minReplicas = 10
 	prime       = 16777619
 )

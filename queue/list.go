@@ -65,7 +65,8 @@ func (f *List) Quit(forces ...bool) {
 		f.l.Remove(data)
 	}
 
-	//reset list
+	//gc opt and reset list
+	runtime.GC()
 	f.l.Init()
 }
 
