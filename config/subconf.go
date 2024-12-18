@@ -51,7 +51,10 @@ func NewSubConfig(
 	}
 
 	//pre load config
-	this.preLoadConfig()
+	err := this.preLoadConfig()
+	if err != nil {
+		panic(any(err))
+	}
 
 	//spawn main process
 	go this.runMainProcess()
@@ -74,12 +77,12 @@ func (c *SubConfig) GetConfMap() map[string]interface{} {
 ///////////////
 
 //pre load all config
-func (c *SubConfig) preLoadConfig() bool {
+func (c *SubConfig) preLoadConfig() error {
 	//begin load config
 	err := c.conf.LoadConfig(c.confFile)
 	if err != nil {
 		log.Println("SubConfig::preLoadConfig failed, error:", err.Error())
-		return false
+		return err
 	}
 
 	//get all data
@@ -89,8 +92,7 @@ func (c *SubConfig) preLoadConfig() bool {
 	if c.cbForAnalyze != nil && c.confMap != nil {
 		c.cbForAnalyze(c.confMap)
 	}
-
-	return true
+	return nil
 }
 
 //check config stat
@@ -113,7 +115,6 @@ func (c *SubConfig) checkFileStat() bool {
 
 	return true
 }
-
 
 //main process
 func (c *SubConfig) runMainProcess() {
