@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/andyzhou/tinylib/util"
 	"log"
+	"math/rand"
+	"runtime"
 	"sync"
 )
 
@@ -36,19 +38,26 @@ type Queue struct {
 
 //construct
 func NewQueue(queueSizes ...int) *Queue {
-	//set queue size
-	queueSize := DefaultQueueSize
+	var (
+		queueSize int
+	)
+	//check and set queue size
 	if queueSizes != nil && len(queueSizes) > 0 {
 		if queueSizes[0] > 0 {
 			queueSize = queueSizes[0]
 		}
 	}
+	if queueSize <= 0 {
+		queueSize = DefaultQueueSize
+	}
+
 	//self init
 	this := &Queue{
 		queueSize: queueSize,
 		reqChan: make(chan interReq, queueSize),
 		closeChan: make(chan bool, 1),
 	}
+
 	//spawn main process
 	go this.runMainProcess()
 	return this
@@ -59,6 +68,8 @@ func (f *Queue) Quit() {
 	if f.closeChan != nil {
 		f.closeChan <- true
 	}
+	//gc opt
+	runtime.GC()
 }
 
 //check queue is closed
@@ -88,6 +99,12 @@ func (f *Queue) SendData(
 		return nil, errors.New("inter chan is nil")
 	}
 
+	//check queue chan is active
+	chanIsClosed, _ := f.IsChanClosed(f.reqChan)
+	if chanIsClosed {
+		return nil, errors.New("request chan is closed")
+	}
+
 	//check active queue size
 	queueSize := f.GetQueueSize()
 	if queueSize >= f.queueSize {
@@ -109,10 +126,10 @@ func (f *Queue) SendData(
 	}
 
 	//send to chan with async mode
-	select {
-	case f.reqChan <- req:
-	}
-
+	//select {
+	//case f.reqChan <- req:
+	//}
+	f.reqChan <- req
 	if needResponse {
 		//wait for response
 		resp, _ = <- req.resp
@@ -154,17 +171,20 @@ func (f *Queue) processChanLeftData() {
 	if f.reqChan == nil || len(f.reqChan) <= 0 {
 		return
 	}
+
 	//process one by one
 	for {
 		//pick data from chan
 		data, isOk = <- f.reqChan
-		if !isOk || data == nil {
-			break
-		}
-		if f.cbForReq != nil {
-			f.cbForReq(data)
+		if isOk && data != nil {
+			if f.cbForReq != nil {
+				f.cbForReq(data)
+			}
 		}
 	}
+
+	//gc opt
+	runtime.GC()
 }
 
 //run main process
@@ -196,11 +216,17 @@ func (f *Queue) runMainProcess() {
 		select {
 		case orgReq, isOk = <- f.reqChan:
 			{
+				//process request
 				if isOk && &orgReq != nil && f.cbForReq != nil {
 					resp, _ = f.cbForReq(orgReq.req)
 					if orgReq.needResp {
 						orgReq.resp <- resp
 					}
+				}
+				//gc opt
+				randVal := rand.Intn(DefaultHunderdPercent)
+				if randVal <= DefaultGcRate {
+					runtime.GC()
 				}
 			}
 		case <- f.closeChan:

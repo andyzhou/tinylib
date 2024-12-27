@@ -3,6 +3,7 @@ package queue
 import (
 	"github.com/andyzhou/tinylib/util"
 	"log"
+	"runtime"
 	"time"
 )
 
@@ -52,6 +53,8 @@ func (f *Ticker) Quit() {
 	if f.closeChan != nil {
 		f.closeChan <- true
 	}
+	//gc opt
+	runtime.GC()
 }
 
 //check ticker is closed
@@ -104,6 +107,7 @@ func (f *Ticker) runMainProcess() {
 		}
 		//close tick chan
 		close(f.tickChan)
+		f.tickChan = nil
 	}()
 
 	//start first ticker
@@ -135,7 +139,9 @@ func (f *Ticker) runMainProcess() {
 						}
 					}
 				}
-				time.AfterFunc(f.tickDuration, sf)
+				//time.AfterFunc(f.tickDuration, sf)
+				time.Sleep(f.tickDuration)
+				sf()
 			}
 		case <- f.closeChan:
 			return

@@ -10,6 +10,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -83,27 +84,50 @@ func testChanIsClosed() {
 
 //test queue
 func testQueue() {
+	var (
+		wg sync.WaitGroup
+	)
 	//init queue
 	q := queue.NewQueue()
 
 	//set callback
 	cbForQuit := func() {
-		log.Printf("cbForQuit\n")
+		fmt.Printf("cbForQuit\n")
 	}
 	cbForOpt := func(data interface{}) (interface{}, error){
-		log.Printf("cbForOpt, data:%v\n", data)
+		//log.Printf("cbForOpt, data:%v\n", data)
 		return nil, nil
 	}
-
 	q.SetCallback(cbForOpt)
 	q.SetQuitCallback(cbForQuit)
 
-	//delay opt
-	delayOpt := func() {
-		q.SendData("test")
-		q.Quit()
+	//add group
+	wg.Add(1)
+
+	//loop send func
+	sendFunc := func() {
+		sendRate := 0.01 //xxx seconds
+		for {
+			if q == nil {
+				break
+			}else{
+				q.SendData(fmt.Sprintf("test-%v", time.Now().UnixNano()))
+				time.Sleep(time.Duration(sendRate * float64(time.Second)))
+			}
+		}
 	}
-	time.AfterFunc(time.Second * 2, delayOpt)
+	go sendFunc()
+
+	//delay quit
+	delayQuit := func() {
+		q.Quit()
+		runtime.GC()
+		wg.Done()
+	}
+	time.AfterFunc(time.Second * 300, delayQuit)
+
+	//group wait
+	wg.Wait()
 }
 
 //test list
@@ -116,18 +140,18 @@ func testList() {
 	l.SetConsumer(cbForListConsumer, 0.2)
 }
 
-//test tick
+//test tick, pass
 func testTick() {
 	//init tick
-	duration := float64(1) //1 second
+	duration := 0.001 //N second
 	t := queue.NewTicker(duration)
 
 	//set callback
 	cbForQuit := func() {
-		log.Printf("cbForQuit\n")
+		fmt.Printf("cbForQuit\n")
 	}
 	cbForCheckOpt := func() error {
-		log.Printf("cbForCheckOpt\n")
+		//fmt.Printf("cbForCheckOpt, now:%v\n", time.Now().UnixNano())
 		return nil
 	}
 
@@ -139,7 +163,7 @@ func testTick() {
 	delayOpt := func() {
 		t.Quit()
 	}
-	time.AfterFunc(time.Second * 60, delayOpt)
+	time.AfterFunc(time.Second * 300, delayOpt)
 }
 
 //test worker
@@ -387,7 +411,7 @@ func main() {
 
 	//test code
 	//testChanIsClosed()
-	//testQueue()
+	testQueue()
 	//testList()
 	//testTick()
 	//testWorker()
@@ -397,6 +421,6 @@ func main() {
 	//testConsistent()
 	//testRing()
 	//testXHash()
-	testDateTime()
+	//testDateTime()
 	wg.Wait()
 }

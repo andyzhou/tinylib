@@ -67,7 +67,7 @@ func TestPush(t *testing.T) {
 }
 
 //benchmark
-func BenchmarkPush(b *testing.B) {
+func BenchmarkListPush(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		pushEle()
 	}
