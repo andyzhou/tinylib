@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"runtime"
 	"sync"
+	"time"
 )
 
 /*
@@ -172,7 +173,7 @@ func (f *Queue) processChanLeftData() {
 		return
 	}
 
-	//process one by one
+	//process left data of chan one by one
 	for {
 		//pick data from chan
 		data, isOk = <- f.reqChan
@@ -211,6 +212,9 @@ func (f *Queue) runMainProcess() {
 		}
 	}()
 
+	//setup seed
+	rand.Seed(time.Now().UnixNano())
+
 	//loop
 	for {
 		select {
@@ -223,8 +227,8 @@ func (f *Queue) runMainProcess() {
 						orgReq.resp <- resp
 					}
 				}
-				//gc opt
-				randVal := rand.Intn(DefaultHunderdPercent)
+				//force gc opt check and run
+				randVal := rand.Intn(DefaultTenThousandPercent)
 				if randVal <= DefaultGcRate {
 					runtime.GC()
 				}

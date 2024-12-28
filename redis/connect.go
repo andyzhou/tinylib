@@ -89,10 +89,10 @@ func (f *Connection) GetConnect() *redis.Conn {
 
 //run script
 func (f *Connection) RunScript(
-				name string,
-				keys []string,
-				args ...interface{},
-			) (interface{}, error) {
+		name string,
+		keys []string,
+		args ...interface{},
+	) (interface{}, error) {
 	script, ok := f.scripts[name]
 	if !ok || script == nil {
 		return nil, fmt.Errorf("scripter is not exist:%s", name)

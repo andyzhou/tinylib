@@ -24,10 +24,10 @@ type (
 	SonWorker struct {
 		workerId int32
 		bindObjs map[int64]interface{}
-		queue *Queue
-		ticker *Ticker
+		queue    *Queue
+		ticker   *Ticker
 		//cb for ticker
-		cbForGenTicker func(int32) error
+		cbForGenTicker     func(int32) error
 		cbForBindObjTicker func(int32, ...interface{}) error
 		sync.RWMutex
 	}
@@ -44,6 +44,7 @@ type Worker struct {
 	cbForQueueOpt         func(interface{}) (interface{}, error)
 	cbForGenTickerOpt     func(int32) error
 	cbForBindObjTickerOpt func(int32, ...interface{}) error
+
 	sync.RWMutex
 	util.Util
 }
@@ -126,8 +127,7 @@ func (f *Worker) SetCBForBindObjTickerOpt(cb func(int32,...interface{}) error) {
 //create workers, STEP-2
 //if tickerRates > 0, will create son worker ticker
 func (f *Worker) CreateWorkers(
-	num int,
-	tickerRates ...float64) error {
+	num int, tickerRates ...float64) error {
 	//check
 	if num <= 0 {
 		return errors.New("invalid parameter")
@@ -222,8 +222,7 @@ func (f *Worker) GetWorkers() int32 {
 }
 
 //get all objs
-func (f *Worker) GetAllBindObj(
-	workerId int32) (map[int64]interface{}, error) {
+func (f *Worker) GetAllBindObj(workerId int32) (map[int64]interface{}, error) {
 	//get target worker by id
 	sonWorker, err := f.GetWorker(workerId)
 	if err != nil || sonWorker == nil {
@@ -298,8 +297,7 @@ func (f *Worker) UpdateBindObj(objId int64, obj interface{}) error {
 
 //get son worker
 //extParas -> dataId(int64), needBind(bool)
-func (f *Worker) GetTargetWorker(
-	extParas ...interface{}) (*SonWorker, error) {
+func (f *Worker) GetTargetWorker(extParas ...interface{}) (*SonWorker, error) {
 	var (
 		objId int64
 		targetWorkerId int32
@@ -356,8 +354,7 @@ func (f *Worker) GetTargetWorker(
 	return nil, errors.New("can't get son worker")
 }
 
-func (f *Worker) GetWorker(
-	workerId int32) (*SonWorker, error) {
+func (f *Worker) GetWorker(workerId int32) (*SonWorker, error) {
 	//check
 	if workerId <= 0 {
 		return nil, errors.New("invalid parameter")
@@ -406,6 +403,8 @@ func (f *SonWorker) Quit() {
 	if f.ticker != nil {
 		f.ticker.Quit()
 	}
+	//gc opt
+	runtime.GC()
 }
 
 //send data

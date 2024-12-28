@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"runtime"
 	"sync"
 )
 
@@ -35,7 +36,13 @@ func NewFaceMap() *FaceMap {
 
 //cleanup
 func (f *FaceMap) CleanUp() {
+	sf := func(k, v interface{}) bool {
+		f.faceMap.Delete(k)
+		return true
+	}
+	f.faceMap.Range(sf)
 	f.faceMap = sync.Map{}
+	runtime.GC()
 }
 
 //get face instance

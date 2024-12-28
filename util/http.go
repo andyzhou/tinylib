@@ -32,11 +32,11 @@ const (
 
 //inter macro define
 const (
-	HttpClientTimeOut = 5 //xx seconds
-	HttpReqChanSize = 1024
+	HttpClientTimeOut  = 5 //xx seconds
+	HttpReqChanSize    = 1024
 	HttpReqRecChanSize = 1
-	HttpReqPrefix = "http://"
-	HttpsReqPrefix = "https://"
+	HttpReqPrefix      = "http://"
+	HttpsReqPrefix     = "https://"
 )
 
 //http file para
@@ -47,7 +47,7 @@ type HttpFilePara struct {
 
 type HttpResp struct {
 	Data []byte
-	Err error
+	Err  error
 }
 
 //http request face info

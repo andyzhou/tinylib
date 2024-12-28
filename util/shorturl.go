@@ -84,9 +84,9 @@ func (s *ShortUrl) defaultCB(url, keyword string) bool {
 // 循环处理4段8位字符，将每段转换成16进制与0x3FFFFFFF进行逻辑与操作，得到30位的无符号数
 // 将30位数分成6段，依次得到6个0-61的数字索引查字符集表获得6位字符串
 func (s *ShortUrl) generator6(
-		charset, url, hexMd5 string,
-		sectionNum int,
-		cb func(url, keyword string) bool) string {
+	charset, url, hexMd5 string,
+	sectionNum int,
+	cb func(url, keyword string) bool) string {
 	for i := 0; i < sectionNum; i++ {
 		sectionHex := hexMd5[i*8:8+i*8]
 		bits, _ := strconv.ParseUint(sectionHex, 16, 32)

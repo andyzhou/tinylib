@@ -135,9 +135,36 @@ func cbForListConsumer(data interface{}) error {
 	return nil
 }
 func testList() {
+	var (
+		wg sync.WaitGroup
+	)
 	//init list
 	l := queue.NewList()
-	l.SetConsumer(cbForListConsumer, 0.2)
+	l.SetConsumer(cbForListConsumer, 0.001)
+
+	wg.Add(1)
+
+	//quit func
+	qf := func() {
+		l.Quit()
+		wg.Done()
+	}
+
+	//test fill data
+	sf := func() {
+		sendRate := 0.001 //xx seconds
+		for {
+			if l.Closed() {
+				break
+			}
+			l.Push(time.Now().UnixNano())
+			time.Sleep(time.Duration(sendRate * float64(time.Second)))
+		}
+	}
+	go sf()
+	time.AfterFunc(time.Second * 60, qf)
+	wg.Wait()
+	fmt.Println("list test finish")
 }
 
 //test tick, pass
@@ -411,8 +438,8 @@ func main() {
 
 	//test code
 	//testChanIsClosed()
-	testQueue()
-	//testList()
+	//testQueue()
+	testList()
 	//testTick()
 	//testWorker()
 	//testPage()

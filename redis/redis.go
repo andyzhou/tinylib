@@ -42,6 +42,11 @@ func (f *Redis) Quit() {
 	f.pubSub.Close()
 }
 
+//is nil
+func (f *Redis) IsNil(err error) bool {
+	return err.Error() == Nil
+}
+
 //get pub sub instance
 func (f *Redis) GetPubSub() *PubSub {
 	return f.pubSub

@@ -16,7 +16,7 @@ import (
 
 //inter macro define
 const (
-	FilePerm     = 0755
+	FilePerm = 0755
 )
 
 //face info
@@ -45,6 +45,10 @@ func (f *Gob) Load(fileName string, outVal interface{}) error {
 		return err
 	}
 
+	//opt with locker
+	f.Lock()
+	defer f.Unlock()
+
 	//try open file
 	file, subErr := os.OpenFile(filePath, os.O_RDONLY, FilePerm)
 	if subErr != nil {
@@ -53,8 +57,6 @@ func (f *Gob) Load(fileName string, outVal interface{}) error {
 	defer file.Close()
 
 	//try decode gob file
-	f.Lock()
-	defer f.Unlock()
 	decoder := gob.NewDecoder(file)
 	err = decoder.Decode(outVal)
 	return err
@@ -67,6 +69,10 @@ func (f *Gob) Store(fileName string, inputVal interface{}) error {
 		return errors.New("invalid parameter")
 	}
 
+	//opt with locker
+	f.Lock()
+	defer f.Unlock()
+
 	//format gob file path
 	filePath := fmt.Sprintf("%v/%v", f.rootPath, fileName)
 
@@ -78,8 +84,6 @@ func (f *Gob) Store(fileName string, inputVal interface{}) error {
 	defer file.Close()
 
 	//try encode gob file
-	f.Lock()
-	defer f.Unlock()
 	enc := gob.NewEncoder(file)
 	err = enc.Encode(inputVal)
 	return err
