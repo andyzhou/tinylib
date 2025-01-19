@@ -8,6 +8,7 @@ import (
 	"github.com/andyzhou/tinylib/util"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -60,9 +61,9 @@ func (f *Connect) Transaction(query string, args ...interface{}) (int64, int64, 
 		return 0, 0, err
 	}
 	//execute
-	result, err := tx.ExecContext(context.Background(), query, args...)
-	if err != nil {
-		return 0, 0, err
+	result, subErr := tx.ExecContext(context.Background(), query, args...)
+	if subErr != nil {
+		return 0, 0, subErr
 	}
 	//commit
 	err = tx.Commit()
@@ -259,12 +260,16 @@ func (f *Connect) releasePool() {
 	}
 	f.Lock()
 	defer f.Unlock()
-	for _, v := range f.poolMap {
+	for k, v := range f.poolMap {
 		if v != nil {
 			v.Close()
 		}
+		delete(f.poolMap, k)
 	}
 	f.poolMap = map[int]*sql.DB{}
+
+	//gc opt
+	runtime.GC()
 }
 
 //fill pool map

@@ -5,8 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d24bc31b-aa94-4cd8-8167-1655b7f45895" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/util/object.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mongo/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/mongo/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mongo/connect.go" beforeDir="false" afterPath="$PROJECT_DIR$/mongo/connect.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mongo/define.go" beforeDir="false" afterPath="$PROJECT_DIR$/mongo/define.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysql/connect.go" beforeDir="false" afterPath="$PROJECT_DIR$/mysql/connect.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysql/def.go" beforeDir="false" afterPath="$PROJECT_DIR$/mysql/def.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysql/json.go" beforeDir="false" afterPath="$PROJECT_DIR$/mysql/json.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mysql/mysql.go" beforeDir="false" afterPath="$PROJECT_DIR$/mysql/mysql.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/redis/connect.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/connect.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

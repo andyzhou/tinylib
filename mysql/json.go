@@ -20,16 +20,16 @@ import (
 type (
 	//where para
 	WherePara struct {
-		Field string
-		Kind int
+		Field     string
+		Kind      int
 		Condition string //used for `WhereKindOfAssigned`, for example ">", "<=", etc.
-		Val interface{}
+		Val       interface{}
 	}
 
 	//order by para
 	OrderBy struct {
 		Field string
-		Desc bool
+		Desc  bool
 	}
 )
 
@@ -38,14 +38,14 @@ type (
 type JsonData struct {}
 
 //get max value for assigned field
-//field should be integer kind
+//the field should be integer kind
 func (f *JsonData) GetMaxVal(
-			jsonField string,
-			whereArr []WherePara,
-			objField string,
-			table string,
-			db *Connect,
-		) (int64, error) {
+		jsonField string,
+		whereArr []WherePara,
+		objField string,
+		table string,
+		db *Connect,
+	) (int64, error) {
 	var (
 		values = make([]interface{}, 0)
 		max int64

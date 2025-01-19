@@ -1,22 +1,22 @@
 package mysql
 
 const (
-	ConnCheckRate = 20 //xxx seconds
-	DBPoolMin = 1
+	ConnCheckRate = 30 //xxx seconds
+	DBPoolMin     = 1
 )
 
 //const db field
 const (
-	TableFieldOfMax = "max"
+	TableFieldOfMax   = "max"
 	TableFieldOfTotal = "total"
-	TableFieldOfData = "data" //db data field
+	TableFieldOfData  = "data" //db data field
 )
 
 //where kind
 const (
-	WhereKindOfGen = iota
-	WhereKindOfIn	  //for in('x','y')
-	WhereKindOfInSet  //for FIND_IN_SET(val, `x`, 'y')
+	WhereKindOfGen      = iota
+	WhereKindOfIn       //for in('x','y')
+	WhereKindOfInSet    //for FIND_IN_SET(val, `x`, 'y')
 	WhereKindOfAssigned //for assigned condition, like '>', '<', '!=', etc.
-	WhereKindOfOrVal	//for or xxx opt
+	WhereKindOfOrVal    //for or xxx opt
 )

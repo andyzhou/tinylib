@@ -63,6 +63,6 @@ func (f *Mysql) CreateConnect(tag string, conf *Config) (*Connect, error) {
 }
 
 //gen new config
-func (f *Mysql)  GenNewConfig() *Config {
+func (f *Mysql) GenNewConfig() *Config {
 	return &Config{}
 }

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	"sync"
 	"time"
 )
 
@@ -22,7 +21,6 @@ type Connection struct {
 	config  *Config
 	scripts map[string]*redis.Script
 	timeout time.Duration
-	sync.RWMutex
 }
 
 //construct
@@ -57,8 +55,6 @@ func (f *Connection) Disconnect() error {
 	var (
 		err error
 	)
-	f.Lock()
-	defer f.Unlock()
 	if f.client != nil {
 		err = f.client.Close()
 	}

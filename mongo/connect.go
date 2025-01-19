@@ -70,10 +70,10 @@ func (f *Connection) BulkWriteEnd(col string, bwOp *BulkWriteOp) (*BulkWriteResu
 
 //insert many
 func (f *Connection) InsertMany(
-				col string,
-				docs []interface{},
-				opts ...*InsertManyOptions,
-			) error {
+		col string,
+		docs []interface{},
+		opts ...*InsertManyOptions,
+	) error {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	_, err := f.db.Collection(col).InsertMany(ctx, docs, opts...)
@@ -82,10 +82,10 @@ func (f *Connection) InsertMany(
 
 //insert one
 func (f *Connection) InsertOne(
-				col string,
-				doc interface{},
-				opts ...*InsertOneOptions,
-			) error {
+		col string,
+		doc interface{},
+		opts ...*InsertOneOptions,
+	) error {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	_, err := f.db.Collection(col).InsertOne(ctx, doc, opts...)
@@ -103,10 +103,10 @@ func (f *Connection) DeleteOne(col string, filter interface{},
 
 //delete many
 func (f *Connection) DelMany(
-				col string,
-				filter interface{},
-				opts ...*DeleteOptions,
-			) error {
+		col string,
+		filter interface{},
+		opts ...*DeleteOptions,
+	) error {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	_, err := f.db.Collection(col).DeleteMany(ctx, filter, opts...)
@@ -115,11 +115,11 @@ func (f *Connection) DelMany(
 
 //update batch
 func (f *Connection) UpdateMany(
-				col string,
-				filter interface{},
-				update interface{},
-				opts ...*UpdateOptions,
-			) error {
+		col string,
+		filter interface{},
+		update interface{},
+		opts ...*UpdateOptions,
+	) error {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	_, err := f.db.Collection(col).UpdateMany(ctx, filter, update, opts...)
@@ -128,11 +128,11 @@ func (f *Connection) UpdateMany(
 
 //update one
 func (f *Connection) UpdateOne(
-				col string,
-				filter interface{},
-				update interface{},
-				opts ...*UpdateOptions,
-			) error {
+		col string,
+		filter interface{},
+		update interface{},
+		opts ...*UpdateOptions,
+	) error {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	_, err := f.db.Collection(col).UpdateOne(ctx, filter, update, opts...)
@@ -141,12 +141,12 @@ func (f *Connection) UpdateOne(
 
 //find and update one
 func (f *Connection) FindOneAndUpdate(
-				col string,
-				filter interface{},
-				update interface{},
-				resp interface{},
-				opts ...*FindOneAndUpdateOptions,
-			) error {
+		col string,
+		filter interface{},
+		update interface{},
+		resp interface{},
+		opts ...*FindOneAndUpdateOptions,
+	) error {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	return f.db.Collection(col).FindOneAndUpdate(ctx, filter, update, opts...).Decode(resp)
@@ -154,11 +154,11 @@ func (f *Connection) FindOneAndUpdate(
 
 //find one
 func (f *Connection) FindOne(
-				col string,
-				filter interface{},
-				resp interface{},
-				opts ... *FindOneOptions,
-			) error {
+		col string,
+		filter interface{},
+		resp interface{},
+		opts ... *FindOneOptions,
+	) error {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	return f.db.Collection(col).FindOne(ctx, filter, opts...).Decode(resp)
@@ -166,10 +166,10 @@ func (f *Connection) FindOne(
 
 //find batch doc by cond
 func (f *Connection) Find(
-				col string,
-				filter interface{},
-				opts ...*FindOptions,
-			) (*mongo.Cursor, error) {
+		col string,
+		filter interface{},
+		opts ...*FindOptions,
+	) (*mongo.Cursor, error) {
 	ctx, cancel := f.createContext()
 	defer cancel()
 	return f.db.Collection(col).Find(ctx, filter, opts...)
