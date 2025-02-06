@@ -12,6 +12,7 @@ require (
 	github.com/liangyaopei/consistent v0.0.0-20200810120524-9f3bf9fdb702
 	github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72
 	github.com/urfave/cli v1.22.16
+	github.com/urfave/cli/v2 v2.27.5
 	go.mongodb.org/mongo-driver v1.14.0
 )
 
@@ -43,6 +44,7 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
+	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
