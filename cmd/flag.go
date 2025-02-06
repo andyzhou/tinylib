@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"errors"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli"
 )
 
 //face info
