@@ -513,7 +513,7 @@ func (f *JsonData) AddData(
 	}
 
 	//format data map
-	dataMap := map[string][]byte {
+	dataMap := map[string]interface{} {
 		TableFieldOfData:jsonByte,
 	}
 
@@ -864,10 +864,10 @@ func (f *JsonData) UpdateDataAdv(
 //add data
 //support multi json data fields
 func (f *JsonData) AddDataAdv(
-			dataMap map[string][]byte,
-			table string,
-			db *Connect,
-		) error {
+		dataMap map[string]interface{},
+		table string,
+		db *Connect,
+	) error {
 	var (
 		buffer = bytes.NewBuffer(nil)
 		valueBuffer = bytes.NewBuffer(nil)
@@ -913,13 +913,13 @@ func (f *JsonData) AddDataAdv(
 //add data with on duplicate update
 //if isInc opt, just increase field value
 func (f *JsonData) AddDataWithDuplicate(
-			jsonByte []byte,
-			updateMap map[string]interface{},
-			isInc bool,
-			objField string,
-			table string,
-			db *Connect,
-		) error {
+		jsonByte []byte,
+		updateMap map[string]interface{},
+		isInc bool,
+		objField string,
+		table string,
+		db *Connect,
+	) error {
 	var (
 		tempStr string
 		updateBuffer = bytes.NewBuffer(nil)
@@ -971,10 +971,10 @@ func (f *JsonData) AddDataWithDuplicate(
 
 //create json_array sql pass json data slice
 func (f *JsonData) GenJsonArrayAppendObject(
-			tabField string,
-			dataField string,
-			jsonSlice []interface{},
-		) (string, []interface{}) {
+		tabField string,
+		dataField string,
+		jsonSlice []interface{},
+	) (string, []interface{}) {
 	var (
 		buffer = bytes.NewBuffer(nil)
 		tempStr string
@@ -1012,8 +1012,8 @@ func (f *JsonData) GenJsonArrayAppendObject(
 //create json_object sql pass json data map
 //return subSql, values
 func (f *JsonData) GenJsonArray(
-			valSlice []interface{},
-		) (string, []interface{}) {
+		valSlice []interface{},
+	) (string, []interface{}) {
 	var (
 		buffer = bytes.NewBuffer(nil)
 		values = make([]interface{}, 0)
@@ -1039,8 +1039,8 @@ func (f *JsonData) GenJsonArray(
 
 //for general map
 func (f *JsonData) GenJsonObject(
-			genHashMap map[string]interface{},
-		) (string, []interface{}) {
+		genHashMap map[string]interface{},
+	) (string, []interface{}) {
 	var (
 		buffer = bytes.NewBuffer(nil)
 		tempStr string
@@ -1094,9 +1094,9 @@ func (f *JsonData) GenJsonObject(
 
 //convert field value into integer format
 func (f *JsonData) getIntegerVal(
-			field string,
-			recordMap map[string]interface{},
-		) int64 {
+		field string,
+		recordMap map[string]interface{},
+	) int64 {
 	v, ok := recordMap[field]
 	if !ok {
 		return 0
@@ -1115,8 +1115,8 @@ func (f *JsonData) getIntegerVal(
 
 //format where sql
 func (f *JsonData) formatWhereSql(
-				whereArr []WherePara,
-			) (*bytes.Buffer, []interface{}) {
+		whereArr []WherePara,
+	) (*bytes.Buffer, []interface{}) {
 	var (
 		tempStr string
 		whereKind int
