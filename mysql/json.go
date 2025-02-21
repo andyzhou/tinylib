@@ -288,13 +288,14 @@ func (f *JsonData) GetBatchDataAdv(
 		orderByBytes.WriteString("ORDER BY ")
 		for _, v := range orderBy {
 			if idx > 0 {
-				orderByBytes.WriteString(",")
+				orderByBytes.WriteString(", ")
 			}
 			descInfo := "ASC"
 			if v.Desc {
 				descInfo = "DESC"
 			}
 			orderByBytes.WriteString(fmt.Sprintf("%v %v", v.Field, descInfo))
+			idx++
 		}
 		orderBySql = fmt.Sprintf("	%v", orderByBytes.String())
 	}
