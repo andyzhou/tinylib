@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"errors"
 	"github.com/andyzhou/tinylib/util"
 	"log"
 	"runtime"
@@ -61,6 +62,24 @@ func (f *Ticker) Quit() {
 func (f *Ticker) QueueClosed() bool {
 	closed, _ := f.IsChanClosed(f.tickChan)
 	return closed
+}
+
+//get current ticker duration
+func (f *Ticker) GetDuration() float64 {
+	return f.tickDuration.Seconds()
+}
+
+//update ticker duration
+func (f *Ticker) UpdateDuration(tickDuration float64) error {
+	//check
+	if tickDuration <= 0 {
+		return errors.New("invalid parameter")
+	}
+
+	//set new duration
+	newDuration := time.Duration(int64(tickDuration * float64(time.Second)))
+	f.tickDuration = newDuration
+	return nil
 }
 
 //set callback for process quit

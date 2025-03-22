@@ -186,11 +186,15 @@ func testTick() {
 	t.SetCheckerCallback(cbForCheckOpt)
 	t.SetQuitCallback(cbForQuit)
 
+	t.UpdateDuration(0.03)
+	durationVal := t.GetDuration()
+	fmt.Printf("durationVal:%v\n", durationVal)
+
 	//delay opt
 	delayOpt := func() {
 		t.Quit()
 	}
-	time.AfterFunc(time.Second * 300, delayOpt)
+	time.AfterFunc(time.Second * 5, delayOpt)
 }
 
 //test worker
@@ -439,8 +443,8 @@ func main() {
 	//test code
 	//testChanIsClosed()
 	//testQueue()
-	testList()
-	//testTick()
+	//testList()
+	testTick()
 	//testWorker()
 	//testPage()
 	//testCHash()
