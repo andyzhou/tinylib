@@ -150,7 +150,7 @@ func (f *Ticker) runMainProcess() {
 			{
 				if f.cbForChecker != nil {
 					//call cb
-					f.cbForChecker()
+					f.cbForChecker(f.inputs...)
 				}
 				//send next ticker
 				sf := func() {
