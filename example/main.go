@@ -168,7 +168,8 @@ func testList() {
 }
 
 //test tick, pass
-func testTick() {
+func testTick(wg *sync.WaitGroup) {
+	defer wg.Done()
 	//init tick
 	duration := 0.001 //N second
 	t := queue.NewTicker(duration)
@@ -177,7 +178,7 @@ func testTick() {
 	cbForQuit := func() {
 		fmt.Printf("cbForQuit\n")
 	}
-	cbForCheckOpt := func() error {
+	cbForCheckOpt := func(inputs ...interface{}) error {
 		//fmt.Printf("cbForCheckOpt, now:%v\n", time.Now().UnixNano())
 		return nil
 	}
@@ -444,7 +445,7 @@ func main() {
 	//testChanIsClosed()
 	//testQueue()
 	//testList()
-	testTick()
+	testTick(&wg)
 	//testWorker()
 	//testPage()
 	//testCHash()

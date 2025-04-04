@@ -20,7 +20,7 @@ type Ticker struct {
 	tickDuration time.Duration
 	tickChan     chan struct{}
 	closeChan    chan bool
-	cbForChecker func() error
+	cbForChecker func(inputs ...interface{}) error
 	cbForQuit    func()
 	util.Util
 }
@@ -92,7 +92,7 @@ func (f *Ticker) SetQuitCallback(cb func()) bool {
 }
 
 //set callback for data opt, STEP-1
-func (f *Ticker) SetCheckerCallback(cb func() error) bool {
+func (f *Ticker) SetCheckerCallback(cb func(inputs ...interface{}) error) bool {
 	if cb == nil {
 		return false
 	}

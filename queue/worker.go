@@ -517,7 +517,7 @@ func (f *SonWorker) UpdateBindObj(objId int64, obj interface{}) error {
 
 //inter cb opt for gen ticker
 //gen and bind obj ticker, only run one
-func (f *SonWorker) interCBForGenTicker() error {
+func (f *SonWorker) interCBForGenTicker(inputs ...interface{}) error {
 	if f.cbForGenTicker == nil {
 		return errors.New("inter cb for gen opt is nil")
 	}
@@ -526,7 +526,7 @@ func (f *SonWorker) interCBForGenTicker() error {
 }
 
 //inter cb opt for bind obj ticker
-func (f *SonWorker) interCBForBindObjTicker() error {
+func (f *SonWorker) interCBForBindObjTicker(inputs ...interface{}) error {
 	if f.cbForBindObjTicker == nil {
 		return errors.New("inter cb for bind obj opt is nil")
 	}
