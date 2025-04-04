@@ -17,6 +17,7 @@ import (
 
 //face info
 type Ticker struct {
+	inputs       []interface{}
 	tickDuration time.Duration
 	tickChan     chan struct{}
 	closeChan    chan bool
@@ -39,6 +40,7 @@ func NewTicker(tickDurations ...float64) *Ticker {
 
 	//self init
 	this := &Ticker{
+		inputs: []interface{}{},
 		tickDuration: durationTicker,
 		tickChan: make(chan struct{}, 1),
 		closeChan: make(chan bool, 1),
@@ -92,11 +94,12 @@ func (f *Ticker) SetQuitCallback(cb func()) bool {
 }
 
 //set callback for data opt, STEP-1
-func (f *Ticker) SetCheckerCallback(cb func(inputs ...interface{}) error) bool {
+func (f *Ticker) SetCheckerCallback(cb func(inputs ...interface{}) error, inputs ...interface{}) bool {
 	if cb == nil {
 		return false
 	}
 	f.cbForChecker = cb
+	f.inputs = inputs
 	return true
 }
 
@@ -118,7 +121,7 @@ func (f *Ticker) runMainProcess() {
 		//run last opt
 		if f.cbForChecker != nil {
 			//call cb
-			f.cbForChecker()
+			f.cbForChecker(f.inputs...)
 		}
 		//call cb for quit
 		if f.cbForQuit != nil {
