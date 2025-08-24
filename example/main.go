@@ -435,6 +435,29 @@ func testDateTime() {
 	log.Printf("dd:%v\n", dd)
 }
 
+//test shard map
+func testShardMap() {
+	type player struct {
+		Name string
+		HP int
+	}
+	//init object
+	sm := util.NewMapShard()
+
+	//write batch data
+	for i := int64(0); i < 500000; i++ {
+		sm.Set(i, &player{Name: fmt.Sprintf("Player%d", i), HP: 100})
+	}
+
+	//del batch data
+	for i := int64(0); i < 500000; i++ {
+		sm.Delete(i)
+	}
+
+	//force rebuilt
+	sm.ForceRebuild()
+}
+
 func main() {
 	var (
 		wg sync.WaitGroup
@@ -445,7 +468,7 @@ func main() {
 	//testChanIsClosed()
 	//testQueue()
 	//testList()
-	testTick(&wg)
+	//testTick(&wg)
 	//testWorker()
 	//testPage()
 	//testCHash()
@@ -454,5 +477,6 @@ func main() {
 	//testRing()
 	//testXHash()
 	//testDateTime()
+	testShardMap()
 	wg.Wait()
 }
