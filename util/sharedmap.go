@@ -37,7 +37,7 @@ type shard struct {
 //face info
 type ShardedMap struct {
 	conf   *SharedMapConf
-	shards map[uint]*shard
+	shards map[uint]*shard //sub shard container
 }
 
 //construct
@@ -143,8 +143,8 @@ func (f *ShardedMap) periodicCheck() {
 			s.RLock()
 			count = len(s.items)
 			s.RUnlock()
-			log.Printf("Shard %d: items=%d, est_mem=%d bytes\n", i, count, mem)
 			if mem > f.conf.RebuildThreshold {
+				log.Printf("Shard %d: items=%d, est_mem=%d bytes\n", i, count, mem)
 				log.Printf("Shard %d memory %d exceeds threshold, rebuilding...\n", i, mem)
 				s.rebuild()
 			}
