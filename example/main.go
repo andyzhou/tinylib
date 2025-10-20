@@ -169,7 +169,6 @@ func testList() {
 
 //test tick, pass
 func testTick(wg *sync.WaitGroup) {
-	defer wg.Done()
 	//init tick
 	duration := 0.001 //N second
 	t := queue.NewTicker(duration)
@@ -179,7 +178,7 @@ func testTick(wg *sync.WaitGroup) {
 		fmt.Printf("cbForQuit\n")
 	}
 	cbForCheckOpt := func(inputs ...interface{}) error {
-		//fmt.Printf("cbForCheckOpt, now:%v\n", time.Now().UnixNano())
+		fmt.Printf("cbForCheckOpt, now:%v\n", time.Now().UnixNano())
 		return nil
 	}
 
@@ -194,6 +193,7 @@ func testTick(wg *sync.WaitGroup) {
 	//delay opt
 	delayOpt := func() {
 		t.Quit()
+		time.AfterFunc(time.Second * 10, wg.Done)
 	}
 	time.AfterFunc(time.Second * 5, delayOpt)
 }
@@ -468,7 +468,7 @@ func main() {
 	//testChanIsClosed()
 	//testQueue()
 	//testList()
-	//testTick(&wg)
+	testTick(&wg)
 	//testWorker()
 	//testPage()
 	//testCHash()
@@ -477,6 +477,6 @@ func main() {
 	//testRing()
 	//testXHash()
 	//testDateTime()
-	testShardMap()
+	//testShardMap()
 	wg.Wait()
 }

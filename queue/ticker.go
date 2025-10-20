@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/andyzhou/tinylib/util"
 	"log"
-	"runtime"
 	"time"
 )
 
@@ -53,11 +52,22 @@ func NewTicker(tickDurations ...float64) *Ticker {
 
 //quit
 func (f *Ticker) Quit() {
+	//close closeChan first
 	if f.closeChan != nil {
-		f.closeChan <- true
+		select {
+		case f.closeChan <- true:
+		default: //ignore block
+		}
+		close(f.closeChan)
 	}
-	//gc opt
-	runtime.GC()
+
+	//wait awhile to let goroutine quit
+	time.Sleep(10 * time.Millisecond)
+
+	//close tickChan
+	if f.tickChan != nil {
+		close(f.tickChan)
+	}
 }
 
 //check ticker is closed
@@ -111,36 +121,44 @@ func (f *Ticker) SetCheckerCallback(cb func(inputs ...interface{}) error, inputs
 func (f *Ticker) runMainProcess() {
 	var (
 		m any = nil
+		isQuitting bool
 	)
 
-	//defer
 	defer func() {
 		if err := recover(); err != m {
 			log.Printf("ticker.runMainProcess panic, err:%v\n", err)
 		}
-		//run last opt
-		if f.cbForChecker != nil {
-			//call cb
-			f.cbForChecker(f.inputs...)
+
+		//only normal quit to execute
+		if isQuitting {
+			if f.cbForChecker != nil {
+				f.cbForChecker(f.inputs...)
+			}
+			if f.cbForQuit != nil {
+				f.cbForQuit()
+			}
 		}
-		//call cb for quit
-		if f.cbForQuit != nil {
-			f.cbForQuit()
+
+		//clean channels
+		if f.tickChan != nil {
+			isClosed, _ := f.IsChanClosed(f.tickChan)
+			if !isClosed {
+				close(f.tickChan)
+				f.tickChan = nil
+			}
 		}
-		//close tick chan
-		close(f.tickChan)
-		f.tickChan = nil
+		if f.closeChan != nil {
+			isClosed, _ := f.IsChanClosed(f.closeChan)
+			if !isClosed {
+				close(f.closeChan)
+				f.closeChan = nil
+			}
+		}
 	}()
 
 	//start first ticker
-	if f.tickChan != nil {
-		sf := func() {
-			chanIsClosed, _ := f.IsChanClosed(f.tickChan)
-			if !chanIsClosed {
-				f.tickChan <- struct{}{}
-			}
-		}
-		sf()
+	if f.tickChan != nil && !f.QueueClosed() {
+		f.tickChan <- struct{}{}
 	}
 
 	//loop
@@ -148,24 +166,25 @@ func (f *Ticker) runMainProcess() {
 		select {
 		case <- f.tickChan:
 			{
+				if isQuitting {
+					//quiting, just return
+					return
+				}
 				if f.cbForChecker != nil {
 					//call cb
 					f.cbForChecker(f.inputs...)
 				}
-				//send next ticker
-				sf := func() {
-					if f.tickChan != nil {
-						chanIsClosed, _ := f.IsChanClosed(f.tickChan)
-						if !chanIsClosed {
-							f.tickChan <- struct{}{}
-						}
+				//send next tick
+				time.Sleep(f.tickDuration)
+				if f.tickChan != nil && !f.QueueClosed() && !isQuitting {
+					select {
+					case f.tickChan <- struct{}{}:
+					default: //ignore block
 					}
 				}
-				//time.AfterFunc(f.tickDuration, sf)
-				time.Sleep(f.tickDuration)
-				sf()
 			}
 		case <- f.closeChan:
+			isQuitting = true
 			return
 		}
 	}

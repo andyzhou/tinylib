@@ -66,11 +66,22 @@ func NewQueue(queueSizes ...int) *Queue {
 
 //quit
 func (f *Queue) Quit() {
+	//close closeChan first
 	if f.closeChan != nil {
-		f.closeChan <- true
+		select {
+		case f.closeChan <- true:
+		default: //ignore block
+		}
+		close(f.closeChan)
 	}
-	//gc opt
-	runtime.GC()
+
+	//wait awhile to let goroutine quit
+	time.Sleep(10 * time.Millisecond)
+
+	//close reqChan
+	if f.reqChan != nil {
+		close(f.reqChan)
+	}
 }
 
 //check queue is closed
@@ -194,6 +205,7 @@ func (f *Queue) runMainProcess() {
 		orgReq interReq
 		resp interface{}
 		isOk bool
+		isQuitting bool
 		m any = nil
 	)
 
@@ -207,8 +219,26 @@ func (f *Queue) runMainProcess() {
 		f.processChanLeftData()
 
 		//call cb for quit
-		if f.cbForQuit != nil {
-			f.cbForQuit()
+		if isQuitting {
+			if f.cbForQuit != nil {
+				f.cbForQuit()
+			}
+		}
+
+		//clean channels
+		if f.reqChan != nil {
+			isClosed, _ := f.IsChanClosed(f.reqChan)
+			if !isClosed {
+				close(f.reqChan)
+				f.reqChan = nil
+			}
+		}
+		if f.closeChan != nil {
+			isClosed, _ := f.IsChanClosed(f.closeChan)
+			if !isClosed {
+				close(f.closeChan)
+				f.closeChan = nil
+			}
 		}
 	}()
 
@@ -220,6 +250,10 @@ func (f *Queue) runMainProcess() {
 		select {
 		case orgReq, isOk = <- f.reqChan:
 			{
+				if isQuitting {
+					//quiting, just return
+					return
+				}
 				//process request
 				if isOk && &orgReq != nil && f.cbForReq != nil {
 					resp, _ = f.cbForReq(orgReq.req)
@@ -235,6 +269,7 @@ func (f *Queue) runMainProcess() {
 			}
 		case <- f.closeChan:
 			{
+				isQuitting = true
 				return
 			}
 		}
