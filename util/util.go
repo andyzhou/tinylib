@@ -197,6 +197,13 @@ func (f *Util) GetRealRandomVal(maxVal int) int {
 	return int(rand.Float64() * 1000) % (maxVal)
 }
 
+func (f *Util) GenRandRangeVal(minVal, maxVal int) int {
+	if minVal > maxVal {
+		minVal, maxVal = maxVal, minVal
+	}
+	return rand.Intn(maxVal-minVal+1) + minVal
+}
+
 //shuffle objs
 func (f *Util) Shuffle(slice interface{}) {
 	rand.Seed(time.Now().UnixNano())

@@ -44,7 +44,7 @@ func (e *SimpleEncrypt) Decrypt(encStr string) (string, error) {
 		return "", errors.New("invalid parameter")
 	}
 	//try decode
-	decodeByte, err := base64.StdEncoding.DecodeString(encStr)
+	decodeByte, err := base64.URLEncoding.DecodeString(encStr)
 	if err != nil {
 		return "", err
 	}
@@ -86,7 +86,7 @@ func (e *SimpleEncrypt) Encrypt(orgStr string) (string, error) {
 		j++
 	}
 	bindKey := e.bindKey(encryptStr.String())
-	return base64.StdEncoding.EncodeToString([]byte(bindKey)), nil
+	return base64.URLEncoding.EncodeToString([]byte(bindKey)), nil
 }
 
 // set key
