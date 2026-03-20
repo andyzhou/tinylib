@@ -23,6 +23,9 @@ import (
  * s := NewSignal()
  * s.RegisterShutDownChan(shutDownChan)
  * s.MonSignal()
+ * //how kill and trigger
+ * ps -ef | grep <your_binary>
+ * kill -15 <go-program-pid>
  */
 
 //inter macro define

@@ -118,18 +118,28 @@ func (f *PubSub) Subscript(channelName string, cb PubSubCallback) error {
 		}()
 
 		//key opt
-		ctx, cancel := f.CreateContext()
-		defer cancel()
+		//ctx, cancel := f.CreateContext()
+		//defer cancel()
+		ctx := context.Background()
 		c := f.conn.GetClient()
 		ps := c.Subscribe(ctx, channelName)
+		//force release ps
+		defer ps.Close()
+
+		//wait subscribe succeed
+		_, err := ps.Receive(ctx)
+		if err != nil {
+			log.Println("subscribe failed:", err)
+			return
+		}
 		dataChan := ps.Channel()
 
 		//loop
 		for {
 			select {
-			case data, ok := <- dataChan:
-				if ok && cb != nil{
-					cb(data)
+			case data, sok := <- dataChan:
+				if sok && cb != nil{
+					go cb(data)
 				}
 			case <- closeChan:
 				return
