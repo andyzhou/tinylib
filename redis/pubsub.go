@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -46,16 +47,19 @@ func (ps *PubSub) SetConn(conn *genRedis.Client) error {
 
 // Subscribe 订阅 channel，可以多次订阅同一 channel，回调异步执行
 func (ps *PubSub) Subscribe(channel string, cb PubSubCallbackWrapper) error {
-	if &cb == nil || channel == "" {
+	if cb.Id == "" || channel == "" {
 		return nil
+	}
+	if ps.conn == nil {
+		return fmt.Errorf("redis connection not set")
 	}
 
 	ps.mu.Lock()
+	defer ps.mu.Unlock()
 	info, ok := ps.chanMap[channel]
 	if ok {
 		// channel 已存在，追加回调
 		info.callbacks = append(info.callbacks, cb)
-		ps.mu.Unlock()
 		return nil
 	}
 
@@ -65,37 +69,92 @@ func (ps *PubSub) Subscribe(channel string, cb PubSubCallbackWrapper) error {
 		stopChan:  make(chan struct{}),
 	}
 	ps.chanMap[channel] = info
-	ps.mu.Unlock()
 
-	go func() {
-		pubsub := ps.conn.Subscribe(context.Background(), channel)
-		defer pubsub.Close()
+	// 启动订阅 goroutine，传递 channel 和 info 的副本
+	go ps.subscribeRoutine(channel, info)
 
-		//wail subscribe succeed
-		if _, err := pubsub.Receive(context.Background()); err != nil {
-			log.Printf("subscribe %v failed:", channel, err)
-			return
-		}
-
-		ch := pubsub.Channel()
-		for {
-			select {
-			case msg, sok := <-ch:
-				if !sok {
-					return
-				}
-				ps.mu.RLock()
-				for _, scb := range info.callbacks {
-					go scb.CB(msg)
-				}
-				ps.mu.RUnlock()
-			case <-info.stopChan:
-				return
-			}
-		}
-	}()
+	//go func(info channelInfo) {
+	//	pubsub := ps.conn.Subscribe(context.Background(), channel)
+	//	defer pubsub.Close()
+	//
+	//	//wail subscribe succeed
+	//	if _, err := pubsub.Receive(context.Background()); err != nil {
+	//		log.Printf("subscribe %v failed:", channel, err)
+	//		return
+	//	}
+	//
+	//	ch := pubsub.Channel()
+	//	for {
+	//		select {
+	//		case msg, sok := <-ch:
+	//			if !sok {
+	//				return
+	//			}
+	//			ps.mu.RLock()
+	//			for _, scb := range info.callbacks {
+	//				go scb.CB(msg)
+	//			}
+	//			ps.mu.RUnlock()
+	//		case <-info.stopChan:
+	//			return
+	//		}
+	//	}
+	//}(*info)
 
 	return nil
+}
+
+func (ps *PubSub) subscribeRoutine(channel string, info *channelInfo) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	pubsub := ps.conn.Subscribe(ctx, channel)
+	defer pubsub.Close()
+
+	//wait subscribe succeed
+	if _, err := pubsub.Receive(ctx); err != nil {
+		log.Printf("subscribe %v failed: %v", channel, err)
+		//cleanup
+		ps.cleanupChannel(channel)
+		return
+	}
+
+	ch := pubsub.Channel()
+	for {
+		select {
+		case msg, ok := <-ch:
+			if !ok {
+				return
+			}
+			ps.handleMessage(info, msg)
+		case <-info.stopChan:
+			return
+		}
+	}
+}
+
+func (ps *PubSub) cleanupChannel(channel string) {
+	ps.mu.Lock()
+	defer ps.mu.Unlock()
+	if info, ok := ps.chanMap[channel]; ok {
+		close(info.stopChan)
+		delete(ps.chanMap, channel)
+	}
+}
+
+func (ps *PubSub) handleMessage(info *channelInfo, msg *genRedis.Message) {
+	ps.mu.RLock()
+	callbacks := make([]PubSubCallbackWrapper, len(info.callbacks))
+	copy(callbacks, info.callbacks)
+	ps.mu.RUnlock()
+
+	for _, cb := range callbacks {
+		go func(cb PubSubCallbackWrapper) {
+			if err := cb.CB(msg); err != nil {
+				log.Printf("callback %s error: %v", cb.Id, err)
+			}
+		}(cb)
+	}
 }
 
 // Unsubscribe 支持取消单个回调或整个 channel
