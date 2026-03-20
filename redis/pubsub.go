@@ -2,165 +2,142 @@ package redis
 
 import (
 	"context"
-	"errors"
-	"github.com/go-redis/redis/v8"
 	"log"
 	"sync"
 	"time"
+
+	genRedis "github.com/go-redis/redis/v8"
 )
 
 /*
  * redis pub sub face
- * @author <AndyZhou>
- * @mail <diudiu8848@163.com>
+ * 支持同一 channel 多回调
+ * @author AndyZhou
  */
+type PubSubCallback func(msg *genRedis.Message) error
 
-//inter data
-type (
-	PubSubCallback func(msg *redis.Message) error
-)
+type PubSubCallbackWrapper struct {
+	Id string
+	CB PubSubCallback
+}
 
-//face info
+type channelInfo struct {
+	callbacks []PubSubCallbackWrapper
+	stopChan  chan struct{}
+}
+
 type PubSub struct {
-	conn    *Connection              //reference
-	chanMap map[string]chan struct{} //channel -> chan struct{}
-	timeout time.Duration
-	sync.RWMutex
+	conn    *genRedis.Client
+	chanMap map[string]*channelInfo
+	mu      sync.RWMutex
 }
 
-//construct
 func NewPubSub() *PubSub {
-	this := &PubSub{
-		timeout: DefaultTimeOut,
-		chanMap: map[string]chan struct{}{},
+	return &PubSub{
+		chanMap: make(map[string]*channelInfo),
 	}
-	return this
 }
 
-//close sub process
-func (f *PubSub) Close() {
-	if f.chanMap == nil || len(f.chanMap) <= 0 {
-		return
-	}
-	f.Lock()
-	defer f.Unlock()
-	for _, v := range f.chanMap {
-		close(v)
-	}
-	f.chanMap = map[string]chan struct{}{}
-}
-
-//close channel
-func (f *PubSub) CloseChannel(channelName string) error {
-	if channelName == "" {
-		return errors.New("invalid parameter")
-	}
-	f.Lock()
-	defer f.Unlock()
-	v, ok := f.chanMap[channelName]
-	if !ok || v == nil {
-		return errors.New("no such channel")
-	}
-	//close chan
-	close(v)
-	delete(f.chanMap, channelName)
+// 设置 Redis 连接
+func (ps *PubSub) SetConn(conn *genRedis.Client) error {
+	ps.conn = conn
 	return nil
 }
 
-//publish message
-func (f *PubSub) Publish(channelName string, message interface{}) error {
-	//check
-	if channelName == "" {
-		return errors.New("invalid parameter")
+// Subscribe 订阅 channel，可以多次订阅同一 channel，回调异步执行
+func (ps *PubSub) Subscribe(channel string, cb PubSubCallbackWrapper) error {
+	if &cb == nil || channel == "" {
+		return nil
 	}
-	if f.conn == nil {
-		return errors.New("inter conn not init")
-	}
-	//key opt
-	ctx, cancel := f.CreateContext()
-	defer cancel()
-	c := f.conn.GetConnect()
-	_, err := c.Publish(ctx, channelName, message).Result()
-	return err
-}
 
-//subscript channel
-func (f *PubSub) Subscript(channelName string, cb PubSubCallback) error {
-	var (
-		m any = nil
-	)
-	//check
-	if channelName == "" || cb == nil {
-		return errors.New("invalid parameter")
-	}
-	if f.conn == nil {
-		return errors.New("inter conn not init")
-	}
-	f.Lock()
-	defer f.Unlock()
-	_, ok := f.chanMap[channelName]
+	ps.mu.Lock()
+	info, ok := ps.chanMap[channel]
 	if ok {
-		return errors.New("channel had subscript")
+		// channel 已存在，追加回调
+		info.callbacks = append(info.callbacks, cb)
+		ps.mu.Unlock()
+		return nil
 	}
-	closeChan := make(chan struct{}, 1)
-	f.chanMap[channelName] = closeChan
 
-	//run sub process
-	sf := func(channelName string, closeChan chan struct{}, cb PubSubCallback) {
-		defer func() {
-			if err := recover(); err != m {
-				log.Printf("PubSub:Subscript channel %v panic, err %v", channelName, err)
-			}
-			f.Lock()
-			defer f.Unlock()
-			close(closeChan)
-			delete(f.chanMap, channelName)
-		}()
+	// 新建 channelInfo
+	info = &channelInfo{
+		callbacks: []PubSubCallbackWrapper{cb},
+		stopChan:  make(chan struct{}),
+	}
+	ps.chanMap[channel] = info
+	ps.mu.Unlock()
 
-		//key opt
-		//ctx, cancel := f.CreateContext()
-		//defer cancel()
-		ctx := context.Background()
-		c := f.conn.GetClient()
-		ps := c.Subscribe(ctx, channelName)
-		//force release ps
-		defer ps.Close()
+	go func() {
+		pubsub := ps.conn.Subscribe(context.Background(), channel)
+		defer pubsub.Close()
 
-		//wait subscribe succeed
-		_, err := ps.Receive(ctx)
-		if err != nil {
-			log.Println("subscribe failed:", err)
+		//wail subscribe succeed
+		if _, err := pubsub.Receive(context.Background()); err != nil {
+			log.Printf("subscribe %v failed:", channel, err)
 			return
 		}
-		dataChan := ps.Channel()
 
-		//loop
+		ch := pubsub.Channel()
 		for {
 			select {
-			case data, sok := <- dataChan:
-				if sok && cb != nil{
-					go cb(data)
+			case msg, sok := <-ch:
+				if !sok {
+					return
 				}
-			case <- closeChan:
+				ps.mu.RLock()
+				for _, scb := range info.callbacks {
+					go scb.CB(msg)
+				}
+				ps.mu.RUnlock()
+			case <-info.stopChan:
 				return
 			}
 		}
-	}
-	go sf(channelName, closeChan, cb)
+	}()
+
 	return nil
 }
 
-//set base redis connect
-func (f *PubSub) SetConn(conn *Connection) error {
-	//check
-	if conn == nil {
-		return errors.New("invalid parameter")
+// Unsubscribe 支持取消单个回调或整个 channel
+func (ps *PubSub) Unsubscribe(channel string, cb PubSubCallbackWrapper) {
+	ps.mu.Lock()
+	defer ps.mu.Unlock()
+	info, ok := ps.chanMap[channel]
+	if !ok {
+		return
 	}
-	f.conn = conn
-	return nil
+
+	if &cb != nil {
+		// 删除指定回调
+		newCallbacks := []PubSubCallbackWrapper{}
+		for _, f := range info.callbacks {
+			if f.Id != cb.Id {
+				newCallbacks = append(newCallbacks, f)
+			}
+		}
+		info.callbacks = newCallbacks
+	}
+
+	// 如果没有回调了，关闭 channel
+	if len(info.callbacks) == 0 {
+		close(info.stopChan)
+		delete(ps.chanMap, channel)
+	}
 }
 
-//create context
-func (f *PubSub) CreateContext() (context.Context, context.CancelFunc){
-	return context.WithTimeout(context.Background(), f.timeout*time.Second)
+// Close 关闭所有订阅
+func (ps *PubSub) Close() {
+	ps.mu.Lock()
+	defer ps.mu.Unlock()
+	for _, info := range ps.chanMap {
+		close(info.stopChan)
+	}
+	ps.chanMap = make(map[string]*channelInfo)
+}
+
+// Publish 使用独立连接发送消息
+func (ps *PubSub) Publish(channel string, message interface{}) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	return ps.conn.Publish(ctx, channel, message).Err()
 }
