@@ -458,6 +458,10 @@ func testShardMap() {
 	sm.ForceRebuild()
 }
 
+func testRedis() {
+	
+}
+
 func main() {
 	var (
 		wg sync.WaitGroup
@@ -468,7 +472,7 @@ func main() {
 	//testChanIsClosed()
 	//testQueue()
 	//testList()
-	testTick(&wg)
+	//testTick(&wg)
 	//testWorker()
 	//testPage()
 	//testCHash()

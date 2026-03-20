@@ -69,12 +69,22 @@ func (f *Connection) Connect() error {
 	if f.client == nil {
 		return errors.New("client hadn't init")
 	}
+
+	//check and close old connect
+	if f.conn != nil {
+		f.conn.Close()
+	}
+
 	ctx, cancel := f.CreateContext()
 	defer cancel()
 	conn := f.client.Conn(ctx)
 	_, err := conn.Ping(ctx).Result()
 	if err == nil {
 		f.conn = conn
+	}else {
+		//set connect nil
+		conn.Close()
+		f.conn = nil
 	}
 	return err
 }
