@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/andyzhou/tinylib/util"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -22,6 +23,7 @@ type Ticker struct {
 	closeChan    chan bool
 	cbForChecker func(inputs ...interface{}) error
 	cbForQuit    func()
+	closeOnce    sync.Once
 	util.Util
 }
 
@@ -136,22 +138,6 @@ func (f *Ticker) runMainProcess() {
 			}
 			if f.cbForQuit != nil {
 				f.cbForQuit()
-			}
-		}
-
-		//clean channels
-		if f.tickChan != nil {
-			isClosed, _ := f.IsChanClosed(f.tickChan)
-			if !isClosed {
-				close(f.tickChan)
-				f.tickChan = nil
-			}
-		}
-		if f.closeChan != nil {
-			isClosed, _ := f.IsChanClosed(f.closeChan)
-			if !isClosed {
-				close(f.closeChan)
-				f.closeChan = nil
 			}
 		}
 	}()
