@@ -4,8 +4,8 @@ import (
 	"errors"
 	"github.com/andyzhou/tinylib/util"
 	"log"
-	"sync"
 	"time"
+	"sync"
 )
 
 /*
@@ -21,9 +21,9 @@ type Ticker struct {
 	tickDuration time.Duration
 	tickChan     chan struct{}
 	closeChan    chan bool
+	closeOnce    sync.Once
 	cbForChecker func(inputs ...interface{}) error
 	cbForQuit    func()
-	closeOnce    sync.Once
 	util.Util
 }
 
@@ -54,22 +54,9 @@ func NewTicker(tickDurations ...float64) *Ticker {
 
 //quit
 func (f *Ticker) Quit() {
-	//close closeChan first
-	if f.closeChan != nil {
-		select {
-		case f.closeChan <- true:
-		default: //ignore block
-		}
-		close(f.closeChan)
-	}
-
-	//wait awhile to let goroutine quit
-	time.Sleep(10 * time.Millisecond)
-
-	//close tickChan
-	if f.tickChan != nil {
-		close(f.tickChan)
-	}
+	f.closeOnce.Do(func() {
+		close(f.closeChan)   // 只关一次
+	})
 }
 
 //check ticker is closed
@@ -140,34 +127,33 @@ func (f *Ticker) runMainProcess() {
 				f.cbForQuit()
 			}
 		}
+
+		// 只有 runMainProcess 关闭 tickChan（唯一所有者）
+		close(f.tickChan)
 	}()
 
 	//start first ticker
-	if f.tickChan != nil && !f.QueueClosed() {
-		f.tickChan <- struct{}{}
+	select {
+	case f.tickChan <- struct{}{}:
+	case <-f.closeChan:
+		isQuitting = true
+		return
 	}
 
 	//loop
 	for {
 		select {
-		case <- f.tickChan:
-			{
-				if isQuitting {
-					//quiting, just return
-					return
-				}
-				if f.cbForChecker != nil {
-					//call cb
-					f.cbForChecker(f.inputs...)
-				}
-				//send next tick
-				time.Sleep(f.tickDuration)
-				if f.tickChan != nil && !f.QueueClosed() && !isQuitting {
-					select {
-					case f.tickChan <- struct{}{}:
-					default: //ignore block
-					}
-				}
+		case <-f.tickChan:
+			if f.cbForChecker != nil {
+				f.cbForChecker(f.inputs...)
+			}
+			time.Sleep(f.tickDuration)
+			// 用 select 同时监听 closeChan，避免 send on closed
+			select {
+			case f.tickChan <- struct{}{}:
+			case <-f.closeChan:
+				isQuitting = true
+				return
 			}
 		case <- f.closeChan:
 			isQuitting = true
